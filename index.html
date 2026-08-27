@@ -277,6 +277,17 @@ table.data-table tr:last-child td { border-bottom: none; }
 
 /* GHG PANEL (used inside GHG modal) */
 .tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ghg-intro { font-size: 12px; color: var(--color-deep-graphite); line-height: 1.65; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--color-cloud-gray); }
+.ghg-intro strong { color: var(--color-rich-black); }
+.faq-section-title { font-size: 11px; font-weight: 600; color: var(--color-pewter); text-transform: uppercase; letter-spacing: 0.06em; margin: 20px 0 10px; }
+.faq-item { border-bottom: 1px solid var(--color-cloud-gray); }
+.faq-item:last-child { border-bottom: none; }
+.faq-item summary { list-style: none; cursor: pointer; padding: 11px 2px; font-size: 12.5px; font-weight: 500; color: var(--color-rich-black); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary .faq-chevron { flex-shrink: 0; color: var(--color-pewter); transition: transform 0.15s; }
+.faq-item[open] summary .faq-chevron { transform: rotate(180deg); }
+.faq-item summary:hover { color: var(--color-grain-green); }
+.faq-answer { font-size: 12px; color: var(--color-deep-graphite); line-height: 1.65; padding: 0 2px 13px; }
 .tier-box { background: var(--color-cloud-gray); border-radius: var(--radius-card); padding: 15px; }
 .tier-box.future { background: #fff; border: 1px dashed var(--color-pale-ash); }
 .tier-label { font-size: 10px; font-weight: 600; color: var(--color-pewter); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
@@ -560,6 +571,7 @@ table.data-table tr:last-child td { border-bottom: none; }
     <button class="modal-close" onclick="closeModal('modal-ghg')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
   <div class="modal-body">
+    <p class="ghg-intro"><strong>What is the GHG Protocol?</strong> It's the world's most widely used framework for measuring and reporting greenhouse gas emissions — developed jointly by the World Resources Institute and the World Business Council for Sustainable Development. It splits emissions into three scopes (direct, purchased-energy, and value-chain) so that figures from different organizations mean the same thing and can be compared on a common basis. Jejak Hijau follows this framework so its numbers hold up against how KPJ Group and outside reviewers already think about emissions.</p>
     <div class="tier-grid">
       <div class="tier-box">
         <div class="tier-label">Tier 1 — Group benchmark</div>
@@ -582,6 +594,28 @@ table.data-table tr:last-child td { border-bottom: none; }
         <p>Sheets/student is reported as a waste-volume figure only. Converting to an emissions estimate would need supply-chain data KPJU doesn't have — kept honest rather than precise-looking.</p>
       </div>
     </div>
+
+    <div class="faq-section-title">FAQs for KPJ Healthcare / KPJU</div>
+    <details class="faq-item">
+      <summary>What are Scope 1, 2, and 3, in campus terms?<svg class="faq-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <p class="faq-answer"><strong>Scope 1</strong> is direct, on-site emissions — backup generators, refrigerant leaks from air-con, anything KPJU burns or vents itself. <strong>Scope 2</strong> is the electricity KPJU buys from the grid to run the campus — that's what this dashboard's Scope 2 card tracks today. <strong>Scope 3</strong> is everything else in the value chain that KPJU influences but doesn't control — for this dashboard, that's exam paper, tracked here as a volume metric rather than converted into an emissions estimate, since we don't yet have the paper supply chain's emissions data to do that conversion credibly.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What's the difference between "location-based" and "market-based" reporting?<svg class="faq-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <p class="faq-answer">Location-based takes the average emissions intensity of the whole grid a site is connected to — Peninsular Malaysia, in KPJU's case — and multiplies it by consumption. Market-based instead uses supplier- or contract-specific data, if the organization has purchased a Green Electricity Tariff (GET), Renewable Energy Certificate, or similar instrument. KPJU hasn't made that purchase yet, so only the location-based figure is meaningful right now.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Without a Green Electricity Tariff, do we still need a separate "market-based" number?<svg class="faq-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <p class="faq-answer">GHG Protocol's Scope 2 Guidance calls for dual reporting (both location- and market-based) wherever supplier-specific data is available in that market. Malaysia doesn't yet have a widely available "residual mix" data product for this, so without a GET or power purchase agreement in place, the market-based figure would default to the same grid-average factor as the location-based one — the two numbers would be identical. That's why Jejak Hijau shows one figure today; a distinct market-based column gets added if and when KPJU purchases a GET.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Where does the grid emission factor come from, and can it change?<svg class="faq-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <p class="faq-answer">Suruhanjaya Tenaga (Malaysia's Energy Commission) publishes it annually, separately for Peninsular Malaysia, Sabah, and Sarawak. Each year's figure is labelled "provisional" until formally endorsed by the government, and it shifts as the generation mix (coal, gas, renewables) changes — so this dashboard's factor should be re-checked against ST's latest publication periodically, not treated as fixed permanently.</p>
+    </details>
+    <details class="faq-item">
+      <summary>If KPJU does eventually buy a GET or REC, what would need to be reported?<svg class="faq-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <p class="faq-answer">GHG Protocol requires disclosing which category of instrument the market-based factor came from — e.g. an unbundled Renewable Energy Certificate, one conveyed through a power purchase agreement, or one from a supplier-specific tariff — and confirming it meets the Scope 2 Quality Criteria. Not relevant to KPJU's numbers today, but worth knowing before signing any future GET contract with TNB.</p>
+    </details>
   </div>
 </div>
 
