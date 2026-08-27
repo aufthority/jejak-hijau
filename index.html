@@ -193,8 +193,21 @@ main.dash-main {
 /* METRIC GRID */
 .metric-grid { flex: 0 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .metric-card {
+  position: relative;
   background: #fff; border: 1px solid var(--color-pale-ash); border-radius: var(--radius-card);
   padding: 13px 15px; box-shadow: var(--shadow-sm); min-width: 0;
+  cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s;
+}
+.metric-card:hover, .metric-card:focus-visible {
+  border-color: var(--color-grain-green); box-shadow: var(--shadow-md);
+  outline: none;
+}
+.metric-info-icon {
+  position: absolute; top: 10px; right: 11px;
+  font-size: 12px; color: var(--color-pale-ash);
+}
+.metric-card:hover .metric-info-icon, .metric-card:focus-visible .metric-info-icon {
+  color: var(--color-grain-green);
 }
 .metric-label { font-size: 10.5px; color: var(--color-pewter); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
 .metric-value { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--color-rich-black); line-height: 1.1; }
@@ -328,6 +341,42 @@ table.data-table tr:last-child td { border-bottom: none; }
 .modal-close:hover { background: var(--color-pale-ash); color: var(--color-rich-black); }
 .modal-body { padding: 20px; }
 
+/* METRIC MODAL — deliberately oversized and high-contrast for reading from
+   across a conference room (projector / big screen), unlike the compact
+   reference modals above. */
+.modal-big { width: min(760px, 94vw); }
+.modal-big .modal-header-text .modal-title { font-size: 19px; }
+.modal-big .modal-header-text .modal-subtitle { font-size: 13px; }
+.modal-big .modal-close { width: 32px; height: 32px; font-size: 15px; }
+.metric-modal-body { padding: 32px 36px 36px; }
+.metric-modal-hero {
+  text-align: center; padding-bottom: 26px; margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-pale-ash);
+}
+.metric-modal-icon { font-size: 34px; margin-bottom: 10px; }
+.metric-modal-value {
+  font-family: var(--font-display); font-size: 60px; font-weight: 600;
+  color: var(--color-rich-black); line-height: 1; margin-bottom: 14px;
+}
+.metric-badge-lg {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 16px; font-weight: 600; padding: 9px 18px; border-radius: var(--radius-tag);
+}
+.metric-badge-lg.over { background: #fef2f2; color: #b91c1c; }
+.metric-badge-lg.under { background: rgba(0,153,89,0.1); color: var(--color-grain-green); }
+.metric-badge-lg.neutral { background: var(--color-cloud-gray); color: var(--color-muted-stone); }
+.metric-modal-section { margin-bottom: 22px; }
+.metric-modal-section:last-child { margin-bottom: 0; }
+.metric-modal-label {
+  font-size: 12.5px; font-weight: 700; color: var(--color-grain-green);
+  text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px;
+}
+.metric-modal-text { font-size: 17px; color: var(--color-deep-graphite); line-height: 1.65; }
+@media (max-width: 640px) {
+  .metric-modal-value { font-size: 44px; }
+  .metric-modal-text { font-size: 15px; }
+}
+
 /* Narrow window: tighten nav */
 @media (max-width: 900px) {
   .nav-tagline { display: none; }
@@ -396,25 +445,29 @@ table.data-table tr:last-child td { border-bottom: none; }
     </div>
 
     <div class="metric-grid">
-      <div class="metric-card">
+      <div class="metric-card" onclick="openMetricModal('kwh')" tabindex="0" role="button" aria-label="Electricity intensity — click for details">
+        <span class="metric-info-icon">ⓘ</span>
         <div class="metric-label">Electricity intensity</div>
         <div class="metric-value" id="m-kwh">—</div>
         <div class="metric-sub" id="m-kwh-sub">kWh per student, this period</div>
         <div class="metric-badge" id="m-kwh-badge"></div>
       </div>
-      <div class="metric-card">
+      <div class="metric-card" onclick="openMetricModal('co2')" tabindex="0" role="button" aria-label="Scope 2 emissions — click for details">
+        <span class="metric-info-icon">ⓘ</span>
         <div class="metric-label">Scope 2 emissions</div>
         <div class="metric-value" id="m-co2">—</div>
         <div class="metric-sub" id="m-co2-sub">tCO₂e per student · location-based</div>
         <div class="metric-badge" id="m-co2-badge"></div>
       </div>
-      <div class="metric-card">
+      <div class="metric-card" onclick="openMetricModal('paper')" tabindex="0" role="button" aria-label="Paper intensity — click for details">
+        <span class="metric-info-icon">ⓘ</span>
         <div class="metric-label">Paper intensity</div>
         <div class="metric-value" id="m-paper">—</div>
         <div class="metric-sub" id="m-paper-sub">sheets per student, this period</div>
         <div class="metric-badge" id="m-paper-badge"></div>
       </div>
-      <div class="metric-card">
+      <div class="metric-card" onclick="openMetricModal('cost')" tabindex="0" role="button" aria-label="Electricity cost — click for details">
+        <span class="metric-info-icon">ⓘ</span>
         <div class="metric-label">Electricity cost</div>
         <div class="metric-value" id="m-cost">—</div>
         <div class="metric-sub" id="m-cost-sub">RM per student, this period</div>
@@ -578,6 +631,32 @@ table.data-table tr:last-child td { border-bottom: none; }
   </div>
 </div>
 
+<div class="modal-backdrop" id="backdrop-modal-metric" onclick="closeModal('modal-metric')"></div>
+<div class="modal modal-big" id="modal-metric">
+  <div class="modal-header">
+    <div class="modal-header-text">
+      <div class="modal-title" id="metric-modal-title">—</div>
+      <div class="modal-subtitle" id="metric-modal-sub">—</div>
+    </div>
+    <button class="modal-close" onclick="closeModal('modal-metric')">✕</button>
+  </div>
+  <div class="modal-body metric-modal-body">
+    <div class="metric-modal-hero">
+      <div class="metric-modal-icon" id="metric-modal-icon">⚡</div>
+      <div class="metric-modal-value" id="metric-modal-value">—</div>
+      <div class="metric-badge-lg neutral" id="metric-modal-badge"></div>
+    </div>
+    <div class="metric-modal-section">
+      <div class="metric-modal-label">What this means</div>
+      <p class="metric-modal-text" id="metric-modal-what"></p>
+    </div>
+    <div class="metric-modal-section">
+      <div class="metric-modal-label">How it's calculated</div>
+      <p class="metric-modal-text" id="metric-modal-how"></p>
+    </div>
+  </div>
+</div>
+
 <script>
 // ---- Modal system ----
 function openModal(id) {
@@ -594,6 +673,14 @@ function closeAllModals() {
 }
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeAllModals();
+});
+document.querySelectorAll('.metric-card').forEach(function(el) {
+  el.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      el.click();
+    }
+  });
 });
 
 // ---- Demo dataset (clearly placeholder — swapped by CSV upload) ----
@@ -1029,6 +1116,79 @@ function switchChartTab(tab) {
 function renderActiveMetrics() {
   if (activeChartTab === 'baseline') renderBaselineMetrics();
   else renderProgressMetrics();
+  captureMetricContext();
+}
+
+// ---- Metric explainer modals (stakeholder / conference-room view) ----
+// Content is static (what the metric means, how it's calculated); the live value,
+// badge and period sub-text are captured straight off the already-rendered card DOM
+// below, so the modal can never show a number the card itself isn't showing.
+const METRIC_INFO = {
+  kwh: {
+    icon: '⚡',
+    title: 'Electricity Intensity',
+    what: 'Measures how much electricity the campus uses relative to the size of the student body, so consumption can be compared fairly across periods even as enrolment changes. This is the primary metric the reduction target and glide path are built around.',
+    how: 'Total campus electricity consumption in kWh (read from TNB billing records) divided by the registered student headcount for that period. Reported as kWh per student.'
+  },
+  co2: {
+    icon: '🌍',
+    title: 'Scope 2 Emissions',
+    what: 'The indirect greenhouse-gas emissions caused by the electricity KPJU purchases from the grid, under the GHG Protocol Scope 2 category. This is a location-based figure — it uses Malaysia’s national grid emission factor rather than a supplier-specific (market-based) one, since KPJU has not purchased Renewable Energy Certificates or a green electricity tariff (GET) for this period. If a GET is purchased in future, a market-based figure should be reported alongside this one, as the GHG Protocol requires dual reporting.',
+    how: 'Electricity intensity (kWh/student) is converted to tonnes of CO₂-equivalent per student using Malaysia’s peninsular grid emission factor of 0.585 tCO₂e per MWh: (kWh ÷ 1000) × 0.585.'
+  },
+  paper: {
+    icon: '📄',
+    title: 'Paper Intensity',
+    what: 'Tracks exam-related paper use per student as a proxy for print-driven waste and resource consumption. It is reported separately from electricity and is not converted into an emissions figure, since KPJU does not yet have supply-chain (paper sourcing, production, disposal) emissions data to do that conversion credibly.',
+    how: 'Total exam sheets printed across the period, divided by the registered student headcount. Reported as sheets per student.'
+  },
+  cost: {
+    icon: '💰',
+    title: 'Electricity Cost',
+    what: 'Puts the same electricity consumption data in financial terms, for the Finance function and leadership audiences who think in Ringgit rather than kWh or tCO₂e. It is a useful companion figure when building the business case for reduction investments, but is not itself a standing sustainability target.',
+    how: 'Total electricity cost in RM (from TNB billing) divided by the registered student headcount for that period. Because tariff rates can shift independently of consumption, this is tracked period-over-period rather than against a fixed target.'
+  }
+};
+
+let currentMetricContext = null;
+
+function captureMetricContext() {
+  const keys = ['kwh', 'co2', 'paper', 'cost'];
+  const ctx = { tab: activeChartTab };
+  keys.forEach(function(key) {
+    const valueEl = document.getElementById('m-' + key);
+    const subEl = document.getElementById('m-' + key + '-sub');
+    const badgeEl = document.getElementById('m-' + key + '-badge');
+    ctx[key] = {
+      value: valueEl ? valueEl.textContent : '—',
+      sub: subEl ? subEl.textContent : '',
+      badgeText: badgeEl ? badgeEl.textContent : '',
+      badgeVariant: badgeEl ? (badgeEl.className.replace('metric-badge', '').trim() || 'neutral') : 'neutral'
+    };
+  });
+  currentMetricContext = ctx;
+}
+
+function openMetricModal(key) {
+  if (!currentMetricContext) captureMetricContext();
+  const info = METRIC_INFO[key];
+  const ctx = currentMetricContext[key];
+  if (!info || !ctx) return;
+
+  document.getElementById('metric-modal-icon').textContent = info.icon;
+  document.getElementById('metric-modal-title').textContent = info.title;
+  document.getElementById('metric-modal-sub').textContent =
+    (currentMetricContext.tab === 'baseline' ? 'Baseline data — ' : 'Progress data — ') + (ctx.sub || 'no period data available');
+  document.getElementById('metric-modal-value').textContent = ctx.value;
+
+  const badgeEl = document.getElementById('metric-modal-badge');
+  badgeEl.className = 'metric-badge-lg ' + ctx.badgeVariant;
+  badgeEl.textContent = ctx.badgeText && ctx.badgeText.trim() ? ctx.badgeText : 'No data available for the selected period';
+
+  document.getElementById('metric-modal-what').textContent = info.what;
+  document.getElementById('metric-modal-how').textContent = info.how;
+
+  openModal('modal-metric');
 }
 
 function renderActiveChart() {
