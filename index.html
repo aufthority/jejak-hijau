@@ -222,6 +222,22 @@ main.dash-main {
 .footprint-note { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--color-pewter); margin-top: 6px; }
 .target-tracker-scroll { flex: 1; min-height: 0; overflow-y: auto; }
 
+/* CHART TABS (Baseline / Progress) */
+.chart-card-head { flex: 0 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.chart-tabs { display: flex; gap: 4px; flex-shrink: 0; }
+.chart-tab {
+  font-family: var(--font-body); font-size: 10.5px; font-weight: 600;
+  padding: 5px 10px; border-radius: 6px; border: 1px solid var(--color-pale-ash);
+  background: #fff; color: var(--color-muted-stone); cursor: pointer; white-space: nowrap;
+}
+.chart-tab:hover { background: var(--color-cloud-gray); }
+.chart-tab.active { background: var(--color-grain-green); color: #fff; border-color: var(--color-grain-green); }
+.progress-empty {
+  position: absolute; inset: 0; display: none; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; padding: 16px;
+}
+.upload-section-label { font-size: 12.5px; font-weight: 600; color: var(--color-deep-graphite); margin-bottom: 8px; }
+
 /* TARGET TRACKER */
 .target-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--color-cloud-gray); }
 .target-row:last-child { border-bottom: none; }
@@ -268,7 +284,7 @@ table.data-table tr:last-child td { border-bottom: none; }
 .upload-zone:hover { border-color: var(--color-grain-green); }
 .upload-zone p { font-size: 12px; color: var(--color-pewter); }
 .upload-zone .upload-title { font-size: 13px; font-weight: 600; color: var(--color-deep-graphite); margin-bottom: 4px; }
-#file-input { display: none; }
+#file-input, #file-input-progress { display: none; }
 .upload-status { font-size: 12px; margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-btn); display: none; }
 .upload-status.success { background: rgba(0,153,89,0.08); border: 1px solid rgba(0,153,89,0.25); color: var(--color-grain-green); }
 .upload-status.error { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; font-weight: 500; }
@@ -283,6 +299,7 @@ table.data-table tr:last-child td { border-bottom: none; }
 .modal-h1 em { font-style: normal; color: var(--color-grain-green); }
 .modal-note { font-size: 12.5px; color: var(--color-dusk-gray); line-height: 1.6; margin-bottom: 12px; }
 .modal-note strong { color: var(--color-deep-graphite); }
+.modal-note code { background: var(--color-cloud-gray); color: var(--color-deep-graphite); padding: 1px 5px; border-radius: 4px; font-size: 11px; font-family: ui-monospace, monospace; }
 .modal-divider { border: none; border-top: 1px solid var(--color-pale-ash); margin: 4px 0 14px; }
 
 /* MODAL SYSTEM */
@@ -407,14 +424,30 @@ table.data-table tr:last-child td { border-bottom: none; }
 
     <div class="chart-target-row">
       <div class="section-card chart-card">
-        <div class="section-title">Reporting-period trend</div>
-        <div class="section-subtitle">Energy &amp; paper intensity per period.</div>
-        <div class="chart-wrap"><canvas id="trend-chart"></canvas></div>
-        <div class="footprint-note">🐾 Not benchmarked against Group figures — see About for why.</div>
+        <div class="chart-card-head">
+          <div>
+            <div class="section-title" id="chart-section-title">Reporting-period trend</div>
+            <div class="section-subtitle" id="chart-section-subtitle">Energy &amp; paper intensity per period.</div>
+          </div>
+          <div class="chart-tabs">
+            <button class="chart-tab active" id="tab-baseline" onclick="switchChartTab('baseline')">Baseline</button>
+            <button class="chart-tab" id="tab-progress" onclick="switchChartTab('progress')">Progress</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="trend-chart"></canvas>
+          <div id="progress-empty" class="progress-empty">
+            <div style="font-size:22px;margin-bottom:6px">🎯</div>
+            <div style="font-weight:600;font-size:12.5px;margin-bottom:4px;color:var(--color-rich-black)">No reduction-strategy data loaded yet</div>
+            <div style="font-size:11px;color:var(--color-pewter);max-width:280px;margin:0 auto 10px">Upload your goal values for each future period — and actuals as they're reported — to track progress here.</div>
+            <button class="btn-primary" style="margin-top:0" onclick="openModal('modal-upload')">Load progress data</button>
+          </div>
+        </div>
+        <div class="footprint-note" id="chart-footnote">🐾 Not benchmarked against Group figures — see About for why.</div>
       </div>
       <div class="section-card target-card">
-        <div class="section-title">Target vs. actual</div>
-        <div class="section-subtitle">This reporting period.</div>
+        <div class="section-title" id="target-section-title">Target vs. actual</div>
+        <div class="section-subtitle" id="target-section-subtitle">This reporting period.</div>
         <div id="target-tracker" class="target-tracker-scroll"></div>
       </div>
     </div>
@@ -439,7 +472,8 @@ table.data-table tr:last-child td { border-bottom: none; }
     <p class="modal-note">Reporting period shown here is a semester, KPJU's own academic cycle. The same method applies to any reporting cadence — a hospital site could run this monthly or quarterly against its own billing cycle without changing the underlying calculation.</p>
     <hr class="modal-divider">
     <p class="modal-note"><strong>Trend chart —</strong> each point is one reporting period. No comparable KPJU trend line exists in any Group report today. Footprint markers trace KPJU's own trail, not benchmarked against Group figures, which don't exist at this granularity.</p>
-    <p class="modal-note" style="margin-bottom:0"><strong>Target tracker —</strong> self-set per-period reduction targets, the exact qualitative/target-setting layer KPJ Group's own 2025 score flagged as lagging.</p>
+    <p class="modal-note"><strong>Target tracker —</strong> self-set per-period reduction targets, the exact qualitative/target-setting layer KPJ Group's own 2025 score flagged as lagging.</p>
+    <p class="modal-note" style="margin-bottom:0"><strong>Progress tab —</strong> once the reduction strategy launches, ongoing actuals are tracked against the goal set for each future period. Periods with no actual yet show as a pending marker on the goal line; hover any point for that period's notes.</p>
   </div>
 </div>
 
@@ -508,6 +542,7 @@ table.data-table tr:last-child td { border-bottom: none; }
     <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
   </div>
   <div class="modal-body">
+    <div class="upload-section-label">Historical baseline (past reporting periods)</div>
     <div class="upload-zone" onclick="document.getElementById('file-input').click()">
       <div class="upload-title">Click to upload CSV / XLSX</div>
       <p>Columns expected: semester (or any period label), kwh, students, sheets, cost_rm</p>
@@ -521,7 +556,25 @@ table.data-table tr:last-child td { border-bottom: none; }
         style="flex-shrink:0;background:var(--color-grain-green);color:#fff;border:none;border-radius:var(--radius-btn);padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer">Load link</button>
     </div>
     <div class="upload-status" id="upload-status"></div>
-    <p style="font-size:10px;color:var(--color-pewter);margin-top:8px;line-height:1.5">Note: this fetches the file directly from your browser. The link must allow anonymous, cross-origin access (a "publish to web" / public CSV export link) — a normal OneDrive share link often blocks this. If loading fails, try a Google Sheets "Publish to web → CSV" link instead, or use the file upload above.</p>
+    <p style="font-size:10px;color:var(--color-pewter);margin-top:8px;margin-bottom:20px;line-height:1.5">Note: this fetches the file directly from your browser. The link must allow anonymous, cross-origin access (a "publish to web" / public CSV export link) — a normal OneDrive share link often blocks this. If loading fails, try a Google Sheets "Publish to web → CSV" link instead, or use the file upload above.</p>
+
+    <hr class="modal-divider">
+
+    <div class="upload-section-label">Reduction strategy progress (ongoing)</div>
+    <p class="modal-note" style="margin-top:-4px">One row per reporting period covering your 2-year monitoring window. Set <code>goal_kwh</code> / <code>goal_sheets</code> for every period up front; leave <code>actual_kwh</code> / <code>actual_sheets</code> blank for periods that haven't happened yet, and fill them in as each period reports. Re-upload the same file any time to refresh — nothing is stored between visits.</p>
+    <div class="upload-zone" onclick="document.getElementById('file-input-progress').click()">
+      <div class="upload-title">Click to upload CSV / XLSX</div>
+      <p>Columns expected: period, goal_kwh, goal_sheets, actual_kwh, actual_sheets, notes</p>
+    </div>
+    <input type="file" id="file-input-progress" accept=".csv,.xlsx" onchange="handleUploadProgress(event)">
+
+    <div style="margin-top:14px;display:flex;gap:8px;align-items:center">
+      <input type="text" id="url-input-progress" placeholder="Paste a published sheet link (e.g. OneDrive, Google Sheets)"
+        style="flex:1;border:1px solid var(--color-pale-ash);border-radius:var(--radius-btn);padding:9px 12px;font-family:var(--font-body);font-size:12px;outline:none">
+      <button onclick="loadProgressFromUrl()"
+        style="flex-shrink:0;background:var(--color-grain-green);color:#fff;border:none;border-radius:var(--radius-btn);padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer">Load link</button>
+    </div>
+    <div class="upload-status" id="upload-status-progress"></div>
   </div>
 </div>
 
@@ -550,6 +603,12 @@ let semesterData = [];
 
 let cohortData = [];
 
+// Reduction-strategy progress: one row per future reporting period, goal set up front,
+// actuals filled in (by re-uploading the same file) as each period reports.
+let progressData = [];
+
+let activeChartTab = 'baseline'; // 'baseline' | 'progress'
+
 let targets = [
   { label: 'Electricity / student', actual: 0, target: 42, unit: 'kWh', lowerIsBetter: true },
   { label: 'Paper / student', actual: 0, target: 30, unit: 'sheets', lowerIsBetter: true },
@@ -561,6 +620,17 @@ function fmt1(n) { return Number(n).toLocaleString(undefined, { maximumFractionD
 function fmt2(n) { return Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 }); }
 
 function pctOver(actual, target) { return ((actual - target) / target) * 100; }
+
+// ---- Small parsing helpers shared by both upload paths ----
+function pick(row, keys) {
+  for (const k of keys) { if (row[k] !== undefined && row[k] !== '') return row[k]; }
+  return undefined;
+}
+function numOrNull(v) {
+  if (v === undefined || v === null || v === '') return null;
+  const n = Number(v);
+  return isNaN(n) ? null : n;
+}
 
 function setBadge(elId, actual, target, unit, decimals) {
   const fmt = decimals === 2 ? fmt2 : fmt1;
@@ -750,6 +820,224 @@ function renderTargets() {
   });
 }
 
+// ---- Baseline / Progress tab switching ----
+function switchChartTab(tab) {
+  activeChartTab = tab;
+  document.getElementById('tab-baseline').classList.toggle('active', tab === 'baseline');
+  document.getElementById('tab-progress').classList.toggle('active', tab === 'progress');
+
+  const chartTitle = document.getElementById('chart-section-title');
+  const chartSubtitle = document.getElementById('chart-section-subtitle');
+  const footnote = document.getElementById('chart-footnote');
+  const targetTitle = document.getElementById('target-section-title');
+  const targetSubtitle = document.getElementById('target-section-subtitle');
+
+  if (tab === 'baseline') {
+    chartTitle.textContent = 'Reporting-period trend';
+    chartSubtitle.textContent = 'Energy & paper intensity per period.';
+    footnote.textContent = '🐾 Not benchmarked against Group figures — see About for why.';
+    targetTitle.textContent = 'Target vs. actual';
+    targetSubtitle.textContent = 'This reporting period.';
+  } else {
+    chartTitle.textContent = 'Reduction strategy progress';
+    chartSubtitle.textContent = 'Goal vs. actual, by reporting period since launch.';
+    footnote.textContent = '📝 Hover a point for that period’s notes.';
+    targetTitle.textContent = 'Progress vs. goal';
+    targetSubtitle.textContent = 'Latest reported period.';
+  }
+  renderActiveChart();
+  renderActiveTargets();
+}
+
+function renderActiveChart() {
+  const emptyEl = document.getElementById('progress-empty');
+  const canvasEl = document.getElementById('trend-chart');
+
+  if (activeChartTab === 'baseline') {
+    emptyEl.style.display = 'none';
+    canvasEl.style.display = 'block';
+    if (!semesterData.length) return;
+    try {
+      if (typeof Chart === 'undefined') throw new Error('Chart.js did not load');
+      renderChart();
+    } catch (err) {
+      const wrap = document.querySelector('.chart-wrap');
+      wrap.insertAdjacentHTML('beforeend', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-pewter);text-align:center;padding:20px;background:#fff">Chart library could not load (offline or blocked). The rest of the dashboard still works — figures below are unaffected.</div>');
+    }
+    return;
+  }
+
+  // Progress tab
+  if (!progressData.length) {
+    if (chart) { chart.destroy(); chart = null; }
+    canvasEl.style.display = 'none';
+    emptyEl.style.display = 'flex';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  canvasEl.style.display = 'block';
+  try {
+    if (typeof Chart === 'undefined') throw new Error('Chart.js did not load');
+    renderProgressChart();
+  } catch (err) {
+    const wrap = document.querySelector('.chart-wrap');
+    wrap.insertAdjacentHTML('beforeend', '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--color-pewter);text-align:center;padding:20px;background:#fff">Chart library could not load (offline or blocked).</div>');
+  }
+}
+
+function renderActiveTargets() {
+  if (activeChartTab === 'baseline') renderTargets();
+  else renderProgressTargets();
+}
+
+function renderProgressChart() {
+  const ctx = document.getElementById('trend-chart').getContext('2d');
+  if (chart) chart.destroy();
+  const labels = progressData.map(d => d.period);
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Goal — kWh/student',
+          data: progressData.map(d => d.goalKwh),
+          borderColor: '#009959',
+          borderDash: [6, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false,
+          spanGaps: true,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Actual — kWh/student',
+          data: progressData.map(d => d.actualKwh),
+          borderColor: '#009959',
+          backgroundColor: 'rgba(0,153,89,0.08)',
+          pointBackgroundColor: '#009959',
+          pointRadius: 5,
+          tension: 0.3,
+          fill: false,
+          spanGaps: false,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Pending — kWh/student',
+          data: progressData.map(d => d.actualKwh == null ? d.goalKwh : null),
+          showLine: false,
+          pointStyle: 'circle',
+          pointRadius: 5,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#c9c9c9',
+          pointBorderWidth: 1.5,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Goal — sheets/student',
+          data: progressData.map(d => d.goalSheets),
+          borderColor: '#949494',
+          borderDash: [6, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false,
+          spanGaps: true,
+          yAxisID: 'y1',
+        },
+        {
+          label: 'Actual — sheets/student',
+          data: progressData.map(d => d.actualSheets),
+          borderColor: '#545454',
+          backgroundColor: 'rgba(84,84,84,0.06)',
+          pointBackgroundColor: '#545454',
+          pointRadius: 5,
+          tension: 0.3,
+          fill: false,
+          spanGaps: false,
+          yAxisID: 'y1',
+        },
+        {
+          label: 'Pending — sheets/student',
+          data: progressData.map(d => d.actualSheets == null ? d.goalSheets : null),
+          showLine: false,
+          pointStyle: 'circle',
+          pointRadius: 5,
+          pointBackgroundColor: '#fff',
+          pointBorderColor: '#c9c9c9',
+          pointBorderWidth: 1.5,
+          yAxisID: 'y1',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Inter', size: 10.5 }, boxWidth: 10, filter: (item) => !item.text.startsWith('Pending') },
+        },
+        tooltip: {
+          filter: (item) => !item.dataset.label.startsWith('Pending'),
+          callbacks: {
+            label: (ctx) => {
+              const val = ctx.parsed.y;
+              if (val == null) return ctx.dataset.label + ': not yet reported';
+              return `${ctx.dataset.label}: ${fmt1(val)}`;
+            },
+            afterBody: (items) => {
+              if (!items.length) return [];
+              const idx = items[0].dataIndex;
+              const note = progressData[idx] && progressData[idx].notes;
+              return note ? ['', '📝 ' + note] : [];
+            },
+          },
+        },
+      },
+      scales: {
+        y: { position: 'left', title: { display: true, text: 'kWh/student', font: { size: 10 } }, grid: { color: '#f0f0f0' } },
+        y1: { position: 'right', title: { display: true, text: 'sheets/student', font: { size: 10 } }, grid: { display: false } },
+        x: { grid: { display: false } },
+      },
+    },
+  });
+}
+
+function renderProgressTargets() {
+  const wrap = document.getElementById('target-tracker');
+  wrap.innerHTML = '';
+  const reported = progressData.filter(d => d.actualKwh != null || d.actualSheets != null);
+  if (!reported.length) {
+    wrap.innerHTML = '<div class="modal-empty" style="padding:12px 0">No progress reported yet for this strategy.</div>';
+    return;
+  }
+  const latest = reported[reported.length - 1];
+  const rows = [];
+  if (latest.actualKwh != null && latest.goalKwh != null) {
+    rows.push({ label: `Electricity / student (${latest.period})`, actual: latest.actualKwh, target: latest.goalKwh, unit: 'kWh' });
+  }
+  if (latest.actualSheets != null && latest.goalSheets != null) {
+    rows.push({ label: `Paper / student (${latest.period})`, actual: latest.actualSheets, target: latest.goalSheets, unit: 'sheets' });
+  }
+  if (!rows.length) {
+    wrap.innerHTML = '<div class="modal-empty" style="padding:12px 0">Latest reported period is missing a goal value to compare against.</div>';
+    return;
+  }
+  rows.forEach(t => {
+    const pct = t.actual > 0 ? Math.min(100, (t.target / t.actual) * 100) : 0;
+    const over = t.actual > t.target;
+    const row = document.createElement('div');
+    row.className = 'target-row';
+    row.innerHTML = `
+      <div class="target-label">${t.label}</div>
+      <div class="target-bar-track"><div class="target-bar-fill ${over ? 'over' : ''}" style="width:${pct}%"></div></div>
+      <div class="target-figure">${fmt1(t.actual)} / ${fmt1(t.target)} ${t.unit}</div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
 function renderCohortTable() {
   const card = document.getElementById('cohort-card');
   const empty = document.getElementById('cohort-empty');
@@ -791,14 +1079,8 @@ function renderAll() {
   content.style.display = 'flex';
 
   renderMetrics();
-  try {
-    if (typeof Chart === 'undefined') throw new Error('Chart.js did not load');
-    renderChart();
-  } catch (err) {
-    const wrap = document.querySelector('.chart-wrap');
-    wrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:12px;color:var(--color-pewter);text-align:center;padding:20px">Chart library could not load (offline or blocked). The rest of the dashboard still works — figures below are unaffected.</div>';
-  }
-  renderTargets();
+  renderActiveChart();
+  renderActiveTargets();
   renderCohortTable();
 }
 
@@ -890,6 +1172,84 @@ async function loadFromUrl() {
     parseWorkbookAndRender(new Uint8Array(buf), 'linked sheet');
   } catch (err) {
     setStatus('error', 'Could not load that link — likely blocked for cross-origin access. Try a "publish to web" CSV link, or use the file upload instead. (' + err.message + ')');
+  }
+}
+
+// ---- Reduction-strategy progress upload (separate dataset from the historical baseline) ----
+function setStatusProgress(kind, message) {
+  const status = document.getElementById('upload-status-progress');
+  status.className = 'upload-status ' + kind;
+  status.style.display = 'block';
+  status.textContent = message;
+  if (kind === 'error') console.error('[Jejak Hijau KPJU]', message);
+  else console.log('[Jejak Hijau KPJU]', message);
+}
+
+function parseProgressWorkbookAndRender(arrayBufferOrData, sourceLabel) {
+  const wb = XLSX.read(arrayBufferOrData, { type: 'array' });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet);
+  if (!rows.length) throw new Error('No rows found');
+  const cleaned = rows
+    .map(r => ({
+      period: pick(r, ['period', 'Period', 'semester', 'Semester']) || '—',
+      goalKwh: numOrNull(pick(r, ['goal_kwh', 'Goal_kWh', 'goal_kWh', 'GoalKwh'])),
+      goalSheets: numOrNull(pick(r, ['goal_sheets', 'Goal_Sheets', 'GoalSheets'])),
+      actualKwh: numOrNull(pick(r, ['actual_kwh', 'Actual_kWh', 'actual_kWh', 'ActualKwh'])),
+      actualSheets: numOrNull(pick(r, ['actual_sheets', 'Actual_Sheets', 'ActualSheets'])),
+      notes: pick(r, ['notes', 'Notes']) || '',
+    }))
+    // drops stray note/blank rows — a real row needs a period label and at least one goal value
+    .filter(r => r.period !== '—' && (r.goalKwh != null || r.goalSheets != null));
+  if (!cleaned.length) throw new Error('No valid rows found (each row needs a period label and at least one goal_kwh/goal_sheets value)');
+  progressData = cleaned;
+
+  if (semesterData.length) {
+    switchChartTab('progress');
+    setStatusProgress('success', `Loaded ${rows.length} row(s) from ${sourceLabel} — Progress tab updated.`);
+  } else {
+    setStatusProgress('success', `Loaded ${rows.length} row(s) from ${sourceLabel}. Load your baseline data above too, then open the Progress tab to see it.`);
+  }
+  closeModal('modal-upload');
+}
+
+function handleUploadProgress(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  setStatusProgress('loading', `Reading ${file.name}…`);
+  if (typeof XLSX === 'undefined') {
+    setStatusProgress('error', 'The spreadsheet engine did not initialize (it is embedded in this file, not loaded from the internet). Re-download the latest version of this file and try again.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      parseProgressWorkbookAndRender(new Uint8Array(e.target.result), file.name);
+    } catch (err) {
+      setStatusProgress('error', 'Could not read that file — check it has period, goal_kwh, goal_sheets columns (actual_kwh, actual_sheets, notes are optional per row). (' + err.message + ')');
+    }
+  };
+  reader.onerror = function() {
+    setStatusProgress('error', 'Browser could not read the file from disk. Try re-selecting it.');
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function loadProgressFromUrl() {
+  const url = document.getElementById('url-input-progress').value.trim();
+  if (!url) return;
+  if (typeof XLSX === 'undefined') {
+    setStatusProgress('error', 'The spreadsheet engine did not initialize (it is embedded in this file, not loaded from the internet). Re-download the latest version of this file and try again.');
+    return;
+  }
+  setStatusProgress('loading', 'Fetching…');
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const buf = await res.arrayBuffer();
+    parseProgressWorkbookAndRender(new Uint8Array(buf), 'linked sheet');
+  } catch (err) {
+    setStatusProgress('error', 'Could not load that link — likely blocked for cross-origin access. Try a "publish to web" CSV link, or use the file upload instead. (' + err.message + ')');
   }
 }
 
