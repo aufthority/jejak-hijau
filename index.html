@@ -74,123 +74,164 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   --radius-tag: 24px;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 14px; scroll-behavior: smooth; }
+html { font-size: 14px; }
+html, body { height: 100%; }
 body {
   font-family: var(--font-body);
   background: var(--color-canvas-white);
   color: var(--color-rich-black);
   line-height: 1.5;
   letter-spacing: -0.14px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* NAV */
 nav {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(250,250,250,0.92);
-  backdrop-filter: blur(12px);
+  flex: 0 0 auto;
+  background: #fff;
   border-bottom: 1px solid var(--color-pale-ash);
-  padding: 0 40px;
-  height: 56px;
-  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  height: 52px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .nav-logo-mark {
-  width: 28px; height: 28px;
+  width: 26px; height: 26px; flex-shrink: 0;
   background: var(--color-grain-green);
   border-radius: 7px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
+  font-size: 13px;
 }
-.nav-brand { font-size: 14px; font-weight: 600; color: var(--color-rich-black); }
+.nav-brand { font-size: 14px; font-weight: 600; color: var(--color-rich-black); white-space: nowrap; }
 .nav-brand span { color: var(--color-grain-green); }
-.nav-tagline { font-size: 12px; color: var(--color-pewter); margin-left: 8px; }
+.nav-tagline { font-size: 12px; color: var(--color-pewter); margin-left: 8px; white-space: nowrap; }
+.nav-links { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.nav-link {
+  font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  background: none; border: 1px solid transparent; border-radius: var(--radius-btn);
+  color: var(--color-muted-stone); padding: 7px 12px; cursor: pointer; white-space: nowrap;
+}
+.nav-link:hover { background: var(--color-cloud-gray); color: var(--color-rich-black); }
+.nav-link-primary { background: var(--color-grain-green); color: #fff; }
+.nav-link-primary:hover { background: #00854d; color: #fff; }
+.nav-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .nav-badge {
   font-size: 11px; font-weight: 500;
   background: var(--color-cloud-gray); color: var(--color-muted-stone);
-  padding: 3px 10px; border-radius: var(--radius-tag);
+  padding: 3px 10px; border-radius: var(--radius-tag); white-space: nowrap;
 }
+.nav-foot { font-size: 11px; color: var(--color-pewter); white-space: nowrap; }
+.nav-foot span { color: var(--color-grain-green); font-weight: 600; }
 
-/* DEMO BANNER */
-.demo-banner {
+/* STATUS STRIP */
+.status-strip {
+  flex: 0 0 auto;
   background: #fffbeb; border-bottom: 1px solid #fde68a;
-  padding: 10px 40px; display: flex; align-items: center; gap: 8px;
-  font-size: 12px; color: #92400e;
+  padding: 7px 24px; display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: #92400e;
 }
-.demo-banner strong { font-weight: 600; }
-.demo-dot { width: 6px; height: 6px; border-radius: 50%; background: #d97706; flex-shrink: 0; }
+.status-strip strong { font-weight: 600; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: #d97706; flex-shrink: 0; }
+.status-link {
+  font: inherit; color: #92400e; font-weight: 700; text-decoration: underline;
+  background: none; border: none; cursor: pointer; padding: 0;
+}
 
-/* HERO */
-.hero {
-  background: var(--gradient-ambient);
-  border-bottom: 1px solid rgba(0,153,89,0.1);
-  padding: 40px; text-align: left;
+/* MAIN */
+main.dash-main {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 14px 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
 }
-.hero-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-grain-green); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-.hero h1 {
-  font-family: var(--font-display); font-size: 32px; font-weight: 600;
-  color: var(--color-rich-black); line-height: 1.2; margin-bottom: 8px;
-}
-.hero h1 em { font-style: normal; color: var(--color-grain-green); }
-.hero p { font-size: 14px; color: var(--color-dusk-gray); max-width: 620px; line-height: 1.6; }
 
-main { max-width: 1100px; margin: 0 auto; padding: 32px 40px; }
+/* EMPTY STATE */
+.empty-state {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; gap: 8px; padding: 24px;
+}
+.empty-icon { font-size: 28px; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--color-rich-black); }
+.empty-sub { font-size: 12px; color: var(--color-pewter); max-width: 420px; }
+.btn-primary {
+  margin-top: 6px; font-family: var(--font-body); font-size: 12px; font-weight: 600;
+  background: var(--color-grain-green); color: #fff; border: none; border-radius: var(--radius-btn);
+  padding: 9px 18px; cursor: pointer;
+}
+.btn-primary:hover { background: #00854d; }
 
-/* METRIC GRID */
-.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
-.metric-card {
-  background: #fff; border: 1px solid var(--color-pale-ash); border-radius: var(--radius-card);
-  padding: 18px; box-shadow: var(--shadow-sm);
-}
-.metric-label { font-size: 11px; color: var(--color-pewter); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
-.metric-value { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--color-rich-black); line-height: 1.1; }
-.metric-sub { font-size: 11px; color: var(--color-pewter); margin-top: 6px; }
-.metric-sub.good { color: var(--color-grain-green); font-weight: 500; }
-.metric-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-tag);
-  margin-top: 8px;
-}
-.metric-badge.over { background: #fef2f2; color: #b91c1c; }
-.metric-badge.under { background: rgba(0,153,89,0.1); color: var(--color-grain-green); }
-.metric-badge.neutral { background: var(--color-cloud-gray); color: var(--color-muted-stone); }
+/* DASHBOARD CONTENT */
+.dash-content { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+
+.top-row { flex: 0 0 auto; display: flex; gap: 10px; flex-wrap: wrap; }
 .insight-banner {
+  flex: 1 1 320px;
   background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-card);
-  padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #78350f; line-height: 1.6;
+  padding: 10px 14px; font-size: 12px; color: #78350f; line-height: 1.5;
 }
 .insight-banner strong { font-weight: 700; }
 .insight-banner .icon { margin-right: 6px; }
 .data-timestamp {
+  flex: 0 1 auto;
   display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-  font-size: 11px; color: var(--color-muted-stone);
+  font-size: 10.5px; color: var(--color-muted-stone);
   background: var(--color-cloud-gray); border-radius: var(--radius-btn);
-  padding: 8px 12px; margin-bottom: 16px;
+  padding: 8px 12px;
 }
 .data-timestamp strong { color: var(--color-deep-graphite); font-weight: 600; }
 .data-timestamp .sep { color: var(--color-pewter); }
 .data-timestamp.stale { background: #fef2f2; color: #b91c1c; }
 .data-timestamp.stale strong { color: #b91c1c; }
 
-/* SECTION CARD */
+/* METRIC GRID */
+.metric-grid { flex: 0 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.metric-card {
+  background: #fff; border: 1px solid var(--color-pale-ash); border-radius: var(--radius-card);
+  padding: 13px 15px; box-shadow: var(--shadow-sm); min-width: 0;
+}
+.metric-label { font-size: 10.5px; color: var(--color-pewter); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.metric-value { font-family: var(--font-display); font-size: 22px; font-weight: 600; color: var(--color-rich-black); line-height: 1.1; }
+.metric-sub { font-size: 10.5px; color: var(--color-pewter); margin-top: 5px; }
+.metric-sub.good { color: var(--color-grain-green); font-weight: 500; }
+.metric-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10.5px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-tag);
+  margin-top: 7px;
+}
+.metric-badge.over { background: #fef2f2; color: #b91c1c; }
+.metric-badge.under { background: rgba(0,153,89,0.1); color: var(--color-grain-green); }
+.metric-badge.neutral { background: var(--color-cloud-gray); color: var(--color-muted-stone); }
+
+/* CHART + TARGET ROW */
+.chart-target-row { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
 .section-card {
   background: #fff; border: 1px solid var(--color-pale-ash); border-radius: var(--radius-card);
-  padding: 24px; box-shadow: var(--shadow-sm); margin-bottom: 20px;
+  padding: 16px; box-shadow: var(--shadow-sm);
 }
-.section-title { font-size: 15px; font-weight: 600; color: var(--color-rich-black); margin-bottom: 4px; }
-.section-subtitle { font-size: 12px; color: var(--color-pewter); margin-bottom: 18px; }
-
-/* CHART */
-.chart-wrap { position: relative; height: 240px; }
+.chart-card, .target-card { display: flex; flex-direction: column; min-height: 0; }
+.section-title { font-size: 13.5px; font-weight: 600; color: var(--color-rich-black); margin-bottom: 2px; flex: 0 0 auto; }
+.section-subtitle { font-size: 11px; color: var(--color-pewter); margin-bottom: 10px; flex: 0 0 auto; }
+.chart-wrap { position: relative; flex: 1; min-height: 0; }
+.footprint-note { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--color-pewter); margin-top: 6px; }
+.target-tracker-scroll { flex: 1; min-height: 0; overflow-y: auto; }
 
 /* TARGET TRACKER */
-.target-row { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--color-cloud-gray); }
+.target-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--color-cloud-gray); }
 .target-row:last-child { border-bottom: none; }
-.target-label { flex: 0 0 160px; font-size: 12px; font-weight: 500; color: var(--color-deep-graphite); }
+.target-label { flex: 0 0 auto; width: 40%; font-size: 11.5px; font-weight: 500; color: var(--color-deep-graphite); }
 .target-bar-track { flex: 1; height: 8px; background: var(--color-cloud-gray); border-radius: 4px; overflow: hidden; }
 .target-bar-fill { height: 100%; background: var(--color-grain-green); border-radius: 4px; }
 .target-bar-fill.over { background: #d97706; }
-.target-figure { flex: 0 0 90px; text-align: right; font-size: 12px; font-weight: 600; color: var(--color-deep-graphite); }
+.target-figure { flex: 0 0 auto; text-align: right; font-size: 11.5px; font-weight: 600; color: var(--color-deep-graphite); white-space: nowrap; }
 
-/* TABLE */
+/* TABLE (used inside Cohort modal) */
 table.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 table.data-table th {
   text-align: left; padding: 8px 10px; background: var(--color-cloud-gray);
@@ -203,10 +244,11 @@ table.data-table tr:last-child td { border-bottom: none; }
   background: rgba(0,153,89,0.08); border: 1px solid rgba(0,153,89,0.2);
   border-radius: 6px; padding: 2px 7px; margin-left: 6px;
 }
+.modal-empty { font-size: 12px; color: var(--color-pewter); padding: 20px 0; text-align: center; }
 
-/* GHG PANEL */
-.tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.tier-box { background: var(--color-cloud-gray); border-radius: var(--radius-card); padding: 16px; }
+/* GHG PANEL (used inside GHG modal) */
+.tier-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.tier-box { background: var(--color-cloud-gray); border-radius: var(--radius-card); padding: 15px; }
 .tier-box.future { background: #fff; border: 1px dashed var(--color-pale-ash); }
 .tier-label { font-size: 10px; font-weight: 600; color: var(--color-pewter); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
 .tier-box p { font-size: 12px; color: var(--color-deep-graphite); line-height: 1.6; }
@@ -218,7 +260,7 @@ table.data-table tr:last-child td { border-bottom: none; }
 }
 .scope-badge.pending { background: #fff7e0; border-color: #fde68a; color: #92400e; }
 
-/* UPLOAD */
+/* UPLOAD (used inside Load Data modal) */
 .upload-zone {
   border: 1.5px dashed var(--color-pale-ash); border-radius: var(--radius-card);
   padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.15s;
@@ -232,24 +274,68 @@ table.data-table tr:last-child td { border-bottom: none; }
 .upload-status.error { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; font-weight: 500; }
 .upload-status.loading { background: var(--color-cloud-gray); border: 1px solid var(--color-pale-ash); color: var(--color-muted-stone); }
 
-/* FOOTPRINT MARKER */
-.footprint-note { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-pewter); margin-top: 10px; }
-
-footer {
-  border-top: 1px solid var(--color-pale-ash); padding: 20px 40px;
-  display: flex; align-items: center; justify-content: space-between; background: #fff;
+/* ABOUT MODAL CONTENT */
+.hero-eyebrow { font-size: 11px; font-weight: 600; color: var(--color-grain-green); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.modal-h1 {
+  font-family: var(--font-display); font-size: 21px; font-weight: 600;
+  color: var(--color-rich-black); line-height: 1.25; margin-bottom: 10px;
 }
-.footer-brand { font-size: 12px; font-weight: 600; color: var(--color-deep-graphite); }
-.footer-brand span { color: var(--color-grain-green); }
-.footer-right { font-size: 11px; color: var(--color-pewter); }
+.modal-h1 em { font-style: normal; color: var(--color-grain-green); }
+.modal-note { font-size: 12.5px; color: var(--color-dusk-gray); line-height: 1.6; margin-bottom: 12px; }
+.modal-note strong { color: var(--color-deep-graphite); }
+.modal-divider { border: none; border-top: 1px solid var(--color-pale-ash); margin: 4px 0 14px; }
 
-@media (max-width: 720px) {
+/* MODAL SYSTEM */
+.modal-backdrop {
+  display: none; position: fixed; inset: 0; background: rgba(20,20,20,0.45); z-index: 200;
+}
+.modal-backdrop.active { display: block; }
+.modal {
+  display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  z-index: 201; background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-md);
+  width: min(640px, 90vw); max-height: 85vh; overflow-y: auto;
+}
+.modal.active { display: block; }
+.modal-header {
+  position: sticky; top: 0; background: #fff; z-index: 1;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  padding: 16px 20px; border-bottom: 1px solid var(--color-pale-ash);
+}
+.modal-header-text .modal-title { font-size: 14.5px; font-weight: 600; color: var(--color-rich-black); }
+.modal-header-text .modal-subtitle { font-size: 11.5px; color: var(--color-pewter); margin-top: 3px; }
+.modal-close {
+  flex-shrink: 0; background: var(--color-cloud-gray); border: none; border-radius: 999px;
+  width: 26px; height: 26px; font-size: 13px; color: var(--color-muted-stone); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--color-pale-ash); color: var(--color-rich-black); }
+.modal-body { padding: 20px; }
+
+/* Narrow window: tighten nav */
+@media (max-width: 900px) {
+  .nav-tagline { display: none; }
+  .nav-link { padding: 7px 9px; font-size: 11.5px; }
+  nav, .status-strip, main.dash-main { padding-left: 16px; padding-right: 16px; }
+}
+@media (max-width: 640px) {
   .metric-grid { grid-template-columns: repeat(2, 1fr); }
-  .tier-grid { grid-template-columns: 1fr; }
-  nav, .hero, main, footer, .demo-banner { padding-left: 20px; padding-right: 20px; }
+  .chart-target-row { grid-template-columns: 1fr; }
+  .nav-foot { display: none; }
+}
+
+/* Short or very narrow windows: fitting everything with zero scroll stops being
+   readable, so fall back to a normal scrolling page instead of crushing content. */
+@media (max-height: 640px), (max-width: 480px) {
+  html, body { height: auto; overflow: visible; }
+  body { display: block; }
+  main.dash-main { overflow: visible; }
+  .dash-content, .chart-target-row { min-height: auto; }
+  .chart-target-row { grid-template-columns: 1fr; }
+  .chart-wrap { height: 220px; flex: none; }
+  .target-tracker-scroll { overflow: visible; }
+  .empty-state { flex: none; padding: 40px 24px; }
 }
 </style>
-</head>
 <body>
 
 <nav>
@@ -258,88 +344,135 @@ footer {
     <div class="nav-brand">Jejak Hijau <span>KPJU</span></div>
     <span class="nav-tagline">/ Campus Sustainability Pilot</span>
   </div>
-  <span class="nav-badge">SPARK 2026 Prototype</span>
-  <span class="nav-badge" title="Confirms this is the offline-capable build with embedded libraries">Build: offline-v2</span>
+  <div class="nav-links">
+    <button class="nav-link" onclick="openModal('modal-about')">About</button>
+    <button class="nav-link" onclick="openModal('modal-cohort')">Cohort</button>
+    <button class="nav-link" onclick="openModal('modal-ghg')">GHG Protocol</button>
+    <button class="nav-link nav-link-primary" onclick="openModal('modal-upload')">Load data</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-badge">SPARK 2026 Prototype</span>
+    <span class="nav-badge" title="Confirms this is the offline-capable build with embedded libraries">Build: offline-v2</span>
+    <span class="nav-foot">Built by <span>Aufthority</span></span>
+  </div>
 </nav>
 
-<div class="demo-banner">
-  <span class="demo-dot"></span>
-  <strong>No live data yet.</strong>&nbsp;This prototype is pilot-ready, not yet piloted. Upload a CSV/XLSX or paste a link below to populate the dashboard — nothing is shown until then.
+<div class="status-strip">
+  <span class="status-dot"></span>
+  <strong>No live data yet.</strong>&nbsp;This prototype is pilot-ready, not yet piloted — <button class="status-link" onclick="openModal('modal-upload')">load a CSV/XLSX or paste a link</button> to populate the dashboard.
 </div>
 
-<div class="hero">
-  <div class="hero-eyebrow">KPJ Healthcare University · Green Healthcare Sustainability Framework</div>
-  <h1>Tracking KPJU's <em>footprint</em>,<br>one reporting period at a time.</h1>
-  <p>Unit-level intensity data — energy and paper use per student — that doesn't currently exist anywhere in KPJ Group's sustainability reporting. Built on the GHG Protocol Corporate Standard, the same accounting foundation universities and companies worldwide use for emissions disclosure.</p>
-  <p style="font-size:12px;color:var(--color-pewter);margin-top:8px">Reporting period shown here is a semester, KPJU's own academic cycle. The same method applies to any reporting cadence — a hospital site could run this monthly or quarterly against its own billing cycle without changing the underlying calculation.</p>
+<main class="dash-main">
+
+  <div id="empty-state" class="empty-state">
+    <div class="empty-icon">📊</div>
+    <div class="empty-title">No data loaded yet</div>
+    <div class="empty-sub">Upload a CSV/XLSX file or paste a link to see metrics, the trend chart, and target tracking.</div>
+    <button class="btn-primary" onclick="openModal('modal-upload')">Load data</button>
+  </div>
+
+  <div id="dashboard-content" class="dash-content" style="display:none">
+
+    <div class="top-row">
+      <div id="insight-banner" class="insight-banner" style="display:none"></div>
+      <div id="data-timestamp" class="data-timestamp" style="display:none"></div>
+    </div>
+
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-label">Electricity intensity</div>
+        <div class="metric-value" id="m-kwh">—</div>
+        <div class="metric-sub">kWh per student, this period</div>
+        <div class="metric-badge" id="m-kwh-badge"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Scope 2 emissions</div>
+        <div class="metric-value" id="m-co2">—</div>
+        <div class="metric-sub" id="m-co2-sub">tCO₂e per student · location-based</div>
+        <div class="metric-badge" id="m-co2-badge"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Paper intensity</div>
+        <div class="metric-value" id="m-paper">—</div>
+        <div class="metric-sub">sheets per student, this period</div>
+        <div class="metric-badge" id="m-paper-badge"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Electricity cost</div>
+        <div class="metric-value" id="m-cost">—</div>
+        <div class="metric-sub" id="m-cost-sub">RM per student, this period</div>
+        <div class="metric-badge" id="m-cost-badge"></div>
+      </div>
+    </div>
+
+    <div class="chart-target-row">
+      <div class="section-card chart-card">
+        <div class="section-title">Reporting-period trend</div>
+        <div class="section-subtitle">Energy &amp; paper intensity per period.</div>
+        <div class="chart-wrap"><canvas id="trend-chart"></canvas></div>
+        <div class="footprint-note">🐾 Not benchmarked against Group figures — see About for why.</div>
+      </div>
+      <div class="section-card target-card">
+        <div class="section-title">Target vs. actual</div>
+        <div class="section-subtitle">This reporting period.</div>
+        <div id="target-tracker" class="target-tracker-scroll"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- ===== MODALS ===== -->
+
+<div class="modal-backdrop" id="backdrop-modal-about" onclick="closeModal('modal-about')"></div>
+<div class="modal" id="modal-about">
+  <div class="modal-header">
+    <div class="modal-header-text">
+      <div class="modal-title">About this dashboard</div>
+      <div class="modal-subtitle">KPJ Healthcare University · Green Healthcare Sustainability Framework</div>
+    </div>
+    <button class="modal-close" onclick="closeModal('modal-about')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="modal-h1">Tracking KPJU's <em>footprint</em>, one reporting period at a time.</div>
+    <p class="modal-note">Unit-level intensity data — energy and paper use per student — that doesn't currently exist anywhere in KPJ Group's sustainability reporting. Built on the GHG Protocol Corporate Standard, the same accounting foundation universities and companies worldwide use for emissions disclosure.</p>
+    <p class="modal-note">Reporting period shown here is a semester, KPJU's own academic cycle. The same method applies to any reporting cadence — a hospital site could run this monthly or quarterly against its own billing cycle without changing the underlying calculation.</p>
+    <hr class="modal-divider">
+    <p class="modal-note"><strong>Trend chart —</strong> each point is one reporting period. No comparable KPJU trend line exists in any Group report today. Footprint markers trace KPJU's own trail, not benchmarked against Group figures, which don't exist at this granularity.</p>
+    <p class="modal-note" style="margin-bottom:0"><strong>Target tracker —</strong> self-set per-period reduction targets, the exact qualitative/target-setting layer KPJ Group's own 2025 score flagged as lagging.</p>
+  </div>
 </div>
 
-<main>
-
-  <div id="empty-state" class="section-card" style="text-align:center;padding:48px 24px">
-    <div style="font-size:28px;margin-bottom:10px">📊</div>
-    <div class="section-title" style="margin-bottom:6px">No data loaded yet</div>
-    <div class="section-subtitle" style="margin-bottom:0">Upload a CSV/XLSX file or paste a link below to see metrics, the trend chart, and target tracking.</div>
-  </div>
-
-  <div id="dashboard-content" style="display:none">
-  <div id="insight-banner" class="insight-banner" style="display:none"></div>
-
-  <div id="data-timestamp" class="data-timestamp" style="display:none"></div>
-
-  <div class="metric-grid">
-    <div class="metric-card">
-      <div class="metric-label">Electricity intensity</div>
-      <div class="metric-value" id="m-kwh">—</div>
-      <div class="metric-sub">kWh per student, this period</div>
-      <div class="metric-badge" id="m-kwh-badge"></div>
+<div class="modal-backdrop" id="backdrop-modal-cohort" onclick="closeModal('modal-cohort')"></div>
+<div class="modal" id="modal-cohort">
+  <div class="modal-header">
+    <div class="modal-header-text">
+      <div class="modal-title">Cohort / course comparison</div>
+      <div class="modal-subtitle">Surfaces where consumption concentrates — a granularity Group-level reporting cannot reach.</div>
     </div>
-    <div class="metric-card">
-      <div class="metric-label">Scope 2 emissions</div>
-      <div class="metric-value" id="m-co2">—</div>
-      <div class="metric-sub" id="m-co2-sub">tCO₂e per student · location-based</div>
-      <div class="metric-badge" id="m-co2-badge"></div>
+    <button class="modal-close" onclick="closeModal('modal-cohort')">✕</button>
+  </div>
+  <div class="modal-body">
+    <div id="cohort-card">
+      <table class="data-table" id="cohort-table">
+        <thead><tr><th>Course / Cohort</th><th>Students</th><th>kWh/student</th><th>Sheets/student</th><th>Notes</th></tr></thead>
+        <tbody></tbody>
+      </table>
     </div>
-    <div class="metric-card">
-      <div class="metric-label">Paper intensity</div>
-      <div class="metric-value" id="m-paper">—</div>
-      <div class="metric-sub">sheets per student, this period</div>
-      <div class="metric-badge" id="m-paper-badge"></div>
+    <div id="cohort-empty" class="modal-empty" style="display:none">No cohort/course-level data in this dataset yet.</div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="backdrop-modal-ghg" onclick="closeModal('modal-ghg')"></div>
+<div class="modal" id="modal-ghg">
+  <div class="modal-header">
+    <div class="modal-header-text">
+      <div class="modal-title">GHG Protocol alignment</div>
+      <div class="modal-subtitle">Two-tier model — Group benchmark reconciled against KPJU's own bottom-up data.</div>
     </div>
-    <div class="metric-card">
-      <div class="metric-label">Electricity cost</div>
-      <div class="metric-value" id="m-cost">—</div>
-      <div class="metric-sub" id="m-cost-sub">RM per student, this period</div>
-      <div class="metric-badge" id="m-cost-badge"></div>
-    </div>
+    <button class="modal-close" onclick="closeModal('modal-ghg')">✕</button>
   </div>
-
-  <div class="section-card">
-    <div class="section-title">Reporting-period trend — energy &amp; paper intensity</div>
-    <div class="section-subtitle">Each point is one reporting period — a semester at KPJU, but the same method works for any cadence. No comparable KPJU trend line exists in any Group report today.</div>
-    <div class="chart-wrap"><canvas id="trend-chart"></canvas></div>
-    <div class="footprint-note">🐾 Footprint markers trace KPJU's own trail — not benchmarked against Group figures, which don't exist at this granularity.</div>
-  </div>
-
-  <div class="section-card">
-    <div class="section-title">Target vs. actual — this period</div>
-    <div class="section-subtitle">Self-set per-period reduction targets, the exact qualitative/target-setting layer KPJ Group's own 2025 score flagged as lagging.</div>
-    <div id="target-tracker"></div>
-  </div>
-
-  <div class="section-card" id="cohort-card">
-    <div class="section-title">Cohort / course comparison</div>
-    <div class="section-subtitle">Surfaces where consumption concentrates — a granularity Group-level reporting cannot reach.</div>
-    <table class="data-table" id="cohort-table">
-      <thead><tr><th>Course / Cohort</th><th>Students</th><th>kWh/student</th><th>Sheets/student</th><th>Notes</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  </div>
-
-  <div class="section-card">
-    <div class="section-title">GHG Protocol alignment</div>
-    <div class="section-subtitle">Two-tier model — Group benchmark reconciled against KPJU's own bottom-up data.</div>
+  <div class="modal-body">
     <div class="tier-grid">
       <div class="tier-box">
         <div class="tier-label">Tier 1 — Group benchmark</div>
@@ -363,10 +496,18 @@ footer {
       </div>
     </div>
   </div>
+</div>
 
-  <div class="section-card">
-    <div class="section-title">Load real data</div>
-    <div class="section-subtitle">Upload a CSV/XLSX or paste a link once Finance, the Exam Unit, and the Registrar have supplied figures — the dashboard above populates from this.</div>
+<div class="modal-backdrop" id="backdrop-modal-upload" onclick="closeModal('modal-upload')"></div>
+<div class="modal" id="modal-upload">
+  <div class="modal-header">
+    <div class="modal-header-text">
+      <div class="modal-title">Load real data</div>
+      <div class="modal-subtitle">Upload a CSV/XLSX or paste a link once Finance, the Exam Unit, and the Registrar have supplied figures.</div>
+    </div>
+    <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
+  </div>
+  <div class="modal-body">
     <div class="upload-zone" onclick="document.getElementById('file-input').click()">
       <div class="upload-title">Click to upload CSV / XLSX</div>
       <p>Columns expected: semester (or any period label), kwh, students, sheets, cost_rm</p>
@@ -382,15 +523,26 @@ footer {
     <div class="upload-status" id="upload-status"></div>
     <p style="font-size:10px;color:var(--color-pewter);margin-top:8px;line-height:1.5">Note: this fetches the file directly from your browser. The link must allow anonymous, cross-origin access (a "publish to web" / public CSV export link) — a normal OneDrive share link often blocks this. If loading fails, try a Google Sheets "Publish to web → CSV" link instead, or use the file upload above.</p>
   </div>
-
-</main>
-
-<footer>
-  <div class="footer-brand">Built by <span>Aufthority</span></div>
-  <div class="footer-right">Jejak Hijau KPJU · SPARK 2026</div>
-</footer>
+</div>
 
 <script>
+// ---- Modal system ----
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+  document.getElementById('backdrop-' + id).classList.add('active');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+  document.getElementById('backdrop-' + id).classList.remove('active');
+}
+function closeAllModals() {
+  document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
+  document.querySelectorAll('.modal-backdrop.active').forEach(b => b.classList.remove('active'));
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeAllModals();
+});
+
 // ---- Demo dataset (clearly placeholder — swapped by CSV upload) ----
 const GRID_EMISSION_FACTOR = 0.585; // tCO2e per MWh, Malaysia peninsular grid (indicative, verify against latest published factor)
 
@@ -552,7 +704,7 @@ function renderChart() {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 11 }, boxWidth: 10 } },
+        legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 10.5 }, boxWidth: 10 } },
         tooltip: {
           callbacks: {
             label: (ctx) => {
@@ -600,11 +752,14 @@ function renderTargets() {
 
 function renderCohortTable() {
   const card = document.getElementById('cohort-card');
+  const empty = document.getElementById('cohort-empty');
   if (!cohortData.length) {
     card.style.display = 'none';
+    if (empty) empty.style.display = 'block';
     return;
   }
   card.style.display = 'block';
+  if (empty) empty.style.display = 'none';
   const tbody = document.querySelector('#cohort-table tbody');
   tbody.innerHTML = '';
   cohortData.forEach(c => {
@@ -626,14 +781,14 @@ function renderAll() {
   const content = document.getElementById('dashboard-content');
 
   if (!semesterData.length) {
-    emptyState.style.display = 'block';
+    emptyState.style.display = 'flex';
     content.style.display = 'none';
     document.getElementById('data-timestamp').style.display = 'none';
     return;
   }
 
   emptyState.style.display = 'none';
-  content.style.display = 'block';
+  content.style.display = 'flex';
 
   renderMetrics();
   try {
@@ -695,6 +850,7 @@ function parseWorkbookAndRender(arrayBufferOrData, sourceLabel) {
   const modifiedDate = wb.Props && wb.Props.ModifiedDate ? wb.Props.ModifiedDate : null;
   renderTimestamp(modifiedDate);
   setStatus('success', `Loaded ${rows.length} row(s) from ${sourceLabel} — dashboard updated.`);
+  closeModal('modal-upload');
 }
 
 function handleUpload(event) {
