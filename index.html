@@ -406,7 +406,7 @@ table.data-table tr:last-child td { border-bottom: none; }
 
 <nav>
   <div class="nav-logo">
-    <div class="nav-logo-mark">🌿</div>
+    <div class="nav-logo-mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg></div>
     <div class="nav-brand">Jejak Hijau <span>KPJU</span></div>
     <span class="nav-tagline">/ Campus Sustainability Pilot</span>
   </div>
@@ -431,7 +431,7 @@ table.data-table tr:last-child td { border-bottom: none; }
 <main class="dash-main">
 
   <div id="empty-state" class="empty-state">
-    <div class="empty-icon">📊</div>
+    <div class="empty-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-grain-green)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div>
     <div class="empty-title">No data loaded yet</div>
     <div class="empty-sub">Upload a CSV/XLSX file or paste a link to see metrics, the trend chart, and target tracking.</div>
     <button class="btn-primary" onclick="openModal('modal-upload')">Load data</button>
@@ -446,28 +446,28 @@ table.data-table tr:last-child td { border-bottom: none; }
 
     <div class="metric-grid">
       <div class="metric-card" onclick="openMetricModal('kwh')" tabindex="0" role="button" aria-label="Electricity intensity — click for details">
-        <span class="metric-info-icon">ⓘ</span>
+        <span class="metric-info-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
         <div class="metric-label">Electricity intensity</div>
         <div class="metric-value" id="m-kwh">—</div>
         <div class="metric-sub" id="m-kwh-sub">kWh per student, this period</div>
         <div class="metric-badge" id="m-kwh-badge"></div>
       </div>
       <div class="metric-card" onclick="openMetricModal('co2')" tabindex="0" role="button" aria-label="Scope 2 emissions — click for details">
-        <span class="metric-info-icon">ⓘ</span>
+        <span class="metric-info-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
         <div class="metric-label">Scope 2 emissions</div>
         <div class="metric-value" id="m-co2">—</div>
         <div class="metric-sub" id="m-co2-sub">tCO₂e per student · location-based</div>
         <div class="metric-badge" id="m-co2-badge"></div>
       </div>
       <div class="metric-card" onclick="openMetricModal('paper')" tabindex="0" role="button" aria-label="Paper intensity — click for details">
-        <span class="metric-info-icon">ⓘ</span>
+        <span class="metric-info-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
         <div class="metric-label">Paper intensity</div>
         <div class="metric-value" id="m-paper">—</div>
         <div class="metric-sub" id="m-paper-sub">sheets per student, this period</div>
         <div class="metric-badge" id="m-paper-badge"></div>
       </div>
       <div class="metric-card" onclick="openMetricModal('cost')" tabindex="0" role="button" aria-label="Electricity cost — click for details">
-        <span class="metric-info-icon">ⓘ</span>
+        <span class="metric-info-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
         <div class="metric-label">Electricity cost</div>
         <div class="metric-value" id="m-cost">—</div>
         <div class="metric-sub" id="m-cost-sub">RM per student, this period</div>
@@ -490,13 +490,13 @@ table.data-table tr:last-child td { border-bottom: none; }
         <div class="chart-wrap">
           <canvas id="trend-chart"></canvas>
           <div id="progress-empty" class="progress-empty">
-            <div style="font-size:22px;margin-bottom:6px">🎯</div>
+            <div style="margin-bottom:6px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--color-grain-green)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="var(--color-grain-green)"/></svg></div>
             <div style="font-weight:600;font-size:12.5px;margin-bottom:4px;color:var(--color-rich-black)">No reduction-strategy data loaded yet</div>
             <div style="font-size:11px;color:var(--color-pewter);max-width:280px;margin:0 auto 10px">Upload your goal values for each future period — and actuals as they're reported — to track progress here.</div>
             <button class="btn-primary" style="margin-top:0" onclick="openModal('modal-upload')">Load progress data</button>
           </div>
         </div>
-        <div class="footprint-note" id="chart-footnote">🐾 Not benchmarked against Group figures — see About for why.</div>
+        <div class="footprint-note" id="chart-footnote"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg> Not benchmarked against Group figures — see About for why.</div>
       </div>
       <div class="section-card target-card">
         <div class="section-title" id="target-section-title">Target vs. actual</div>
@@ -517,7 +517,7 @@ table.data-table tr:last-child td { border-bottom: none; }
       <div class="modal-title">About this dashboard</div>
       <div class="modal-subtitle">KPJ Healthcare University · Green Healthcare Sustainability Framework</div>
     </div>
-    <button class="modal-close" onclick="closeModal('modal-about')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-about')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
   <div class="modal-body">
     <div class="modal-h1">Tracking KPJU's <em>footprint</em>, one reporting period at a time.</div>
@@ -537,7 +537,7 @@ table.data-table tr:last-child td { border-bottom: none; }
       <div class="modal-title">Cohort / course comparison</div>
       <div class="modal-subtitle">Surfaces where consumption concentrates — a granularity Group-level reporting cannot reach.</div>
     </div>
-    <button class="modal-close" onclick="closeModal('modal-cohort')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-cohort')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
   <div class="modal-body">
     <div id="cohort-card">
@@ -557,7 +557,7 @@ table.data-table tr:last-child td { border-bottom: none; }
       <div class="modal-title">GHG Protocol alignment</div>
       <div class="modal-subtitle">Two-tier model — Group benchmark reconciled against KPJU's own bottom-up data.</div>
     </div>
-    <button class="modal-close" onclick="closeModal('modal-ghg')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-ghg')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
   <div class="modal-body">
     <div class="tier-grid">
@@ -592,7 +592,7 @@ table.data-table tr:last-child td { border-bottom: none; }
       <div class="modal-title">Load real data</div>
       <div class="modal-subtitle">Upload a CSV/XLSX or paste a link once Finance, the Exam Unit, and the Registrar have supplied figures.</div>
     </div>
-    <button class="modal-close" onclick="closeModal('modal-upload')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-upload')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
   <div class="modal-body">
     <div class="upload-section-label">Historical baseline (past reporting periods)</div>
@@ -638,11 +638,11 @@ table.data-table tr:last-child td { border-bottom: none; }
       <div class="modal-title" id="metric-modal-title">—</div>
       <div class="modal-subtitle" id="metric-modal-sub">—</div>
     </div>
-    <button class="modal-close" onclick="closeModal('modal-metric')">✕</button>
+    <button class="modal-close" onclick="closeModal('modal-metric')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
   </div>
   <div class="modal-body metric-modal-body">
     <div class="metric-modal-hero">
-      <div class="metric-modal-icon" id="metric-modal-icon">⚡</div>
+      <div class="metric-modal-icon" id="metric-modal-icon"></div>
       <div class="metric-modal-value" id="metric-modal-value">—</div>
       <div class="metric-badge-lg neutral" id="metric-modal-badge"></div>
     </div>
@@ -929,12 +929,12 @@ function renderProgressInsight(latest, prev, co2PerStudent, co2Goal) {
     banner.style.background = '#f0fdf4';
     banner.style.borderColor = 'rgba(0,153,89,0.3)';
     banner.style.color = '#14532d';
-    banner.innerHTML = `<span class="icon">✅</span><strong>Tracking on goal (${latest.period})</strong> — ${parts.join(' and ')}.${trendNote}`;
+    banner.innerHTML = `<span class="icon">${ICON_CHECK}</span><strong>Tracking on goal (${latest.period})</strong> — ${parts.join(' and ')}.${trendNote}`;
   } else {
     banner.style.background = '#fffbeb';
     banner.style.borderColor = '#fde68a';
     banner.style.color = '#78350f';
-    banner.innerHTML = `<span class="icon">⚠️</span><strong>Behind goal (${latest.period})</strong> — ${parts.join(' and ')}.${trendNote} These compare against this period's own goal from the progress data — not the flat baseline target.`;
+    banner.innerHTML = `<span class="icon">${ICON_WARN}</span><strong>Behind goal (${latest.period})</strong> — ${parts.join(' and ')}.${trendNote} These compare against this period's own goal from the progress data — not the flat baseline target.`;
   }
   banner.style.display = 'block';
 }
@@ -969,12 +969,12 @@ function renderInsight(latest, prev, co2PerStudent, co2Target) {
     banner.style.background = '#f0fdf4';
     banner.style.borderColor = 'rgba(0,153,89,0.3)';
     banner.style.color = '#14532d';
-    banner.innerHTML = `<span class="icon">✅</span><strong>This period is on track</strong> — ${parts.join(' and ')}.${trendNote}`;
+    banner.innerHTML = `<span class="icon">${ICON_CHECK}</span><strong>This period is on track</strong> — ${parts.join(' and ')}.${trendNote}`;
   } else {
     banner.style.background = '#fffbeb';
     banner.style.borderColor = '#fde68a';
     banner.style.color = '#78350f';
-    banner.innerHTML = `<span class="icon">⚠️</span><strong>This period needs attention</strong> — ${parts.join(' and ')}.${trendNote} Lower is better for both metrics — the red "over target" badges above show exactly where the gap is.`;
+    banner.innerHTML = `<span class="icon">${ICON_WARN}</span><strong>This period needs attention</strong> — ${parts.join(' and ')}.${trendNote} Lower is better for both metrics — the red "over target" badges above show exactly where the gap is.`;
   }
   banner.style.display = 'block';
 }
@@ -1097,13 +1097,13 @@ function switchChartTab(tab) {
   if (tab === 'baseline') {
     chartTitle.textContent = 'Reporting-period trend';
     chartSubtitle.textContent = 'Energy & paper intensity per period.';
-    footnote.textContent = '🐾 Not benchmarked against Group figures — see About for why.';
+    footnote.innerHTML = ICON_INFO + ' Not benchmarked against Group figures — see About for why.';
     targetTitle.textContent = 'Target vs. actual';
     targetSubtitle.textContent = 'This reporting period.';
   } else {
     chartTitle.textContent = 'Reduction strategy progress';
     chartSubtitle.textContent = 'Goal vs. actual, by reporting period since launch.';
-    footnote.textContent = '📝 Hover a point for that period’s notes.';
+    footnote.innerHTML = ICON_NOTE + ' Hover a point for that period’s notes.';
     targetTitle.textContent = 'Progress vs. goal';
     targetSubtitle.textContent = 'Latest reported period.';
   }
@@ -1123,27 +1123,41 @@ function renderActiveMetrics() {
 // Content is static (what the metric means, how it's calculated); the live value,
 // badge and period sub-text are captured straight off the already-rendered card DOM
 // below, so the modal can never show a number the card itself isn't showing.
+// ---- Shared inline SVG icons (replaces emoji for a consistent, premium look) ----
+function iconSvg(paths, size = 14, color = 'currentColor', extra = '') {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;${extra}">${paths}</svg>`;
+}
+const ICON_CHECK = iconSvg('<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>');
+const ICON_WARN = iconSvg('<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>');
+const ICON_INFO = iconSvg('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>', 12);
+const ICON_CALENDAR = iconSvg('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>');
+const ICON_NOTE = iconSvg('<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/>', 12);
+const METRIC_ICON_ZAP = iconSvg('<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/>', 34, 'var(--color-grain-green)', 'stroke-width:1.6');
+const METRIC_ICON_GLOBE = iconSvg('<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/>', 34, 'var(--color-grain-green)', 'stroke-width:1.6');
+const METRIC_ICON_FILE = iconSvg('<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h8"/>', 34, 'var(--color-grain-green)', 'stroke-width:1.6');
+const METRIC_ICON_MONEY = iconSvg('<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 12h.01"/><path d="M18 12h.01"/>', 34, 'var(--color-grain-green)', 'stroke-width:1.6');
+
 const METRIC_INFO = {
   kwh: {
-    icon: '⚡',
+    icon: METRIC_ICON_ZAP,
     title: 'Electricity Intensity',
     what: 'Measures how much electricity the campus uses relative to the size of the student body, so consumption can be compared fairly across periods even as enrolment changes. This is the primary metric the reduction target and glide path are built around.',
     how: 'Total campus electricity consumption in kWh (read from TNB billing records) divided by the registered student headcount for that period. Reported as kWh per student.'
   },
   co2: {
-    icon: '🌍',
+    icon: METRIC_ICON_GLOBE,
     title: 'Scope 2 Emissions',
     what: 'The indirect greenhouse-gas emissions caused by the electricity KPJU purchases from the grid, under the GHG Protocol Scope 2 category. This is a location-based figure — it uses Malaysia’s national grid emission factor rather than a supplier-specific (market-based) one, since KPJU has not purchased Renewable Energy Certificates or a green electricity tariff (GET) for this period. If a GET is purchased in future, a market-based figure should be reported alongside this one, as the GHG Protocol requires dual reporting.',
     how: 'Electricity intensity (kWh/student) is converted to tonnes of CO₂-equivalent per student using Malaysia’s peninsular grid emission factor of 0.585 tCO₂e per MWh: (kWh ÷ 1000) × 0.585.'
   },
   paper: {
-    icon: '📄',
+    icon: METRIC_ICON_FILE,
     title: 'Paper Intensity',
     what: 'Tracks exam-related paper use per student as a proxy for print-driven waste and resource consumption. It is reported separately from electricity and is not converted into an emissions figure, since KPJU does not yet have supply-chain (paper sourcing, production, disposal) emissions data to do that conversion credibly.',
     how: 'Total exam sheets printed across the period, divided by the registered student headcount. Reported as sheets per student.'
   },
   cost: {
-    icon: '💰',
+    icon: METRIC_ICON_MONEY,
     title: 'Electricity Cost',
     what: 'Puts the same electricity consumption data in financial terms, for the Finance function and leadership audiences who think in Ringgit rather than kWh or tCO₂e. It is a useful companion figure when building the business case for reduction investments, but is not itself a standing sustainability target.',
     how: 'Total electricity cost in RM (from TNB billing) divided by the registered student headcount for that period. Because tariff rates can shift independently of consumption, this is tracked period-over-period rather than against a fixed target.'
@@ -1175,7 +1189,7 @@ function openMetricModal(key) {
   const ctx = currentMetricContext[key];
   if (!info || !ctx) return;
 
-  document.getElementById('metric-modal-icon').textContent = info.icon;
+  document.getElementById('metric-modal-icon').innerHTML = info.icon;
   document.getElementById('metric-modal-title').textContent = info.title;
   document.getElementById('metric-modal-sub').textContent =
     (currentMetricContext.tab === 'baseline' ? 'Baseline data — ' : 'Progress data — ') + (ctx.sub || 'no period data available');
@@ -1332,7 +1346,7 @@ function renderProgressChart() {
               if (!items.length) return [];
               const idx = items[0].dataIndex;
               const note = progressData[idx] && progressData[idx].notes;
-              return note ? ['', '📝 ' + note] : [];
+              return note ? ['', 'Note: ' + note] : [];
             },
           },
         },
@@ -1457,8 +1471,8 @@ function renderActiveTimestamp() {
 
   const fileLabel = activeChartTab === 'baseline' ? 'Baseline file' : 'Progress file';
   el.className = 'data-timestamp' + (isStale ? ' stale' : '');
-  el.innerHTML = `📅 <strong>${fileLabel} last modified:</strong> ${modifiedStr} <span class="sep">·</span> <strong>Loaded into this dashboard:</strong> ${loadedStr}` +
-    (isStale ? ' <span class="sep">·</span> <strong>⚠ This file may be out of date</strong> — check with the data owner before using it for decisions.' : '');
+  el.innerHTML = `${ICON_CALENDAR} <strong>${fileLabel} last modified:</strong> ${modifiedStr} <span class="sep">·</span> <strong>Loaded into this dashboard:</strong> ${loadedStr}` +
+    (isStale ? ` <span class="sep">·</span> ${ICON_WARN} <strong>This file may be out of date</strong> — check with the data owner before using it for decisions.` : '');
   el.style.display = 'flex';
 }
 
