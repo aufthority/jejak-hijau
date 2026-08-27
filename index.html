@@ -163,7 +163,10 @@ table.data-table tr:last-child td { border-bottom: none; }
 .upload-zone p { font-size: 12px; color: var(--color-pewter); }
 .upload-zone .upload-title { font-size: 13px; font-weight: 600; color: var(--color-deep-graphite); margin-bottom: 4px; }
 #file-input { display: none; }
-.upload-status { font-size: 11px; color: var(--color-grain-green); margin-top: 8px; display: none; }
+.upload-status { font-size: 12px; margin-top: 10px; padding: 10px 12px; border-radius: var(--radius-btn); display: none; }
+.upload-status.success { background: rgba(0,153,89,0.08); border: 1px solid rgba(0,153,89,0.25); color: var(--color-grain-green); }
+.upload-status.error { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; font-weight: 500; }
+.upload-status.loading { background: var(--color-cloud-gray); border: 1px solid var(--color-pale-ash); color: var(--color-muted-stone); }
 
 /* FOOTPRINT MARKER */
 .footprint-note { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-pewter); margin-top: 10px; }
@@ -196,7 +199,7 @@ footer {
 
 <div class="demo-banner">
   <span class="demo-dot"></span>
-  <strong>Demo data.</strong>&nbsp;This prototype is pilot-ready, not yet piloted — figures below are illustrative placeholders. Upload a CSV to preview with real data once collected.
+  <strong>No live data yet.</strong>&nbsp;This prototype is pilot-ready, not yet piloted. Upload a CSV/XLSX or paste a link below to populate the dashboard — nothing is shown until then.
 </div>
 
 <div class="hero">
@@ -207,6 +210,13 @@ footer {
 
 <main>
 
+  <div id="empty-state" class="section-card" style="text-align:center;padding:48px 24px">
+    <div style="font-size:28px;margin-bottom:10px">📊</div>
+    <div class="section-title" style="margin-bottom:6px">No data loaded yet</div>
+    <div class="section-subtitle" style="margin-bottom:0">Upload a CSV/XLSX file or paste a link below to see metrics, the trend chart, and target tracking.</div>
+  </div>
+
+  <div id="dashboard-content" style="display:none">
   <div class="metric-grid">
     <div class="metric-card">
       <div class="metric-label">Electricity intensity</div>
@@ -243,13 +253,14 @@ footer {
     <div id="target-tracker"></div>
   </div>
 
-  <div class="section-card">
+  <div class="section-card" id="cohort-card">
     <div class="section-title">Cohort / course comparison</div>
     <div class="section-subtitle">Surfaces where consumption concentrates — a granularity Group-level reporting cannot reach.</div>
     <table class="data-table" id="cohort-table">
       <thead><tr><th>Course / Cohort</th><th>Students</th><th>kWh/student</th><th>Sheets/student</th><th>Notes</th></tr></thead>
       <tbody></tbody>
     </table>
+  </div>
   </div>
 
   <div class="section-card">
@@ -281,7 +292,7 @@ footer {
 
   <div class="section-card">
     <div class="section-title">Load real data</div>
-    <div class="section-subtitle">Upload a CSV once Finance, the Exam Unit, and the Registrar have supplied figures — replaces the demo values above.</div>
+    <div class="section-subtitle">Upload a CSV/XLSX or paste a link once Finance, the Exam Unit, and the Registrar have supplied figures — the dashboard above populates from this.</div>
     <div class="upload-zone" onclick="document.getElementById('file-input').click()">
       <div class="upload-title">Click to upload CSV / XLSX</div>
       <p>Columns expected: semester, kwh, students, sheets, cost_rm</p>
@@ -309,23 +320,13 @@ footer {
 // ---- Demo dataset (clearly placeholder — swapped by CSV upload) ----
 const GRID_EMISSION_FACTOR = 0.585; // tCO2e per MWh, Malaysia peninsular grid (indicative, verify against latest published factor)
 
-let semesterData = [
-  { semester: 'Y1S1', kwh: 42, students: 1180, sheets: 38, cost_rm: 18.9 },
-  { semester: 'Y1S2', kwh: 45, students: 1205, sheets: 41, cost_rm: 20.3 },
-  { semester: 'Y2S1', kwh: 47, students: 1230, sheets: 36, cost_rm: 21.2 },
-  { semester: 'Y2S2', kwh: 44, students: 1260, sheets: 33, cost_rm: 19.8 },
-];
+let semesterData = [];
 
-let cohortData = [
-  { name: 'PHIA 4312 — Instrumentation Analysis', students: 84, kwh: 61, sheets: 40, note: 'Higher kWh — lab/instrumentation-heavy course' },
-  { name: 'PHCH 4123 — Pharmaceutical Chemistry II', students: 84, kwh: 44, sheets: 33, note: '' },
-  { name: 'DPH 48 (paper data pull)', students: 84, kwh: null, sheets: 35, note: 'Process-validation pilot only — confirms Exam Unit data supply, not the reported campus figure' },
-  { name: 'School of Pharmacy — all cohorts', students: 1260, kwh: 44, sheets: 33, note: 'Reported figure — full-population denominator' },
-];
+let cohortData = [];
 
 let targets = [
-  { label: 'Electricity / student', actual: 44, target: 42, unit: 'kWh', lowerIsBetter: true },
-  { label: 'Paper / student', actual: 33, target: 30, unit: 'sheets', lowerIsBetter: true },
+  { label: 'Electricity / student', actual: 0, target: 42, unit: 'kWh', lowerIsBetter: true },
+  { label: 'Paper / student', actual: 0, target: 30, unit: 'sheets', lowerIsBetter: true },
 ];
 
 let chart;
@@ -396,10 +397,15 @@ function renderChart() {
 }
 
 function renderTargets() {
+  if (semesterData.length) {
+    const latest = semesterData[semesterData.length - 1];
+    targets[0].actual = latest.kwh;
+    targets[1].actual = latest.sheets;
+  }
   const wrap = document.getElementById('target-tracker');
   wrap.innerHTML = '';
   targets.forEach(t => {
-    const pct = Math.min(100, (t.target / t.actual) * 100);
+    const pct = t.actual > 0 ? Math.min(100, (t.target / t.actual) * 100) : 0;
     const over = t.actual > t.target;
     const row = document.createElement('div');
     row.className = 'target-row';
@@ -413,6 +419,12 @@ function renderTargets() {
 }
 
 function renderCohortTable() {
+  const card = document.getElementById('cohort-card');
+  if (!cohortData.length) {
+    card.style.display = 'none';
+    return;
+  }
+  card.style.display = 'block';
   const tbody = document.querySelector('#cohort-table tbody');
   tbody.innerHTML = '';
   cohortData.forEach(c => {
@@ -430,6 +442,18 @@ function renderCohortTable() {
 }
 
 function renderAll() {
+  const emptyState = document.getElementById('empty-state');
+  const content = document.getElementById('dashboard-content');
+
+  if (!semesterData.length) {
+    emptyState.style.display = 'block';
+    content.style.display = 'none';
+    return;
+  }
+
+  emptyState.style.display = 'none';
+  content.style.display = 'block';
+
   renderMetrics();
   try {
     if (typeof Chart === 'undefined') throw new Error('Chart.js did not load');
@@ -440,6 +464,15 @@ function renderAll() {
   }
   renderTargets();
   renderCohortTable();
+}
+
+function setStatus(kind, message) {
+  const status = document.getElementById('upload-status');
+  status.className = 'upload-status ' + kind;
+  status.style.display = 'block';
+  status.textContent = message;
+  if (kind === 'error') console.error('[Jejak Hijau KPJU]', message);
+  else console.log('[Jejak Hijau KPJU]', message);
 }
 
 function parseWorkbookAndRender(arrayBufferOrData, sourceLabel) {
@@ -455,20 +488,15 @@ function parseWorkbookAndRender(arrayBufferOrData, sourceLabel) {
     cost_rm: Number(r.cost_rm || r.cost || 0),
   }));
   renderAll();
-  const status = document.getElementById('upload-status');
-  status.style.display = 'block';
-  status.style.color = 'var(--color-grain-green)';
-  status.textContent = `Loaded ${rows.length} row(s) from ${sourceLabel} — dashboard updated.`;
+  setStatus('success', `Loaded ${rows.length} row(s) from ${sourceLabel} — dashboard updated.`);
 }
 
 function handleUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
+  setStatus('loading', `Reading ${file.name}…`);
   if (typeof XLSX === 'undefined') {
-    const status = document.getElementById('upload-status');
-    status.style.display = 'block';
-    status.style.color = '#b91c1c';
-    status.textContent = 'CSV library could not load — check your internet connection and try again.';
+    setStatus('error', 'The spreadsheet library (SheetJS) failed to load from the CDN — check your internet connection, ad-blocker, or try a different browser/network. Open the browser console (F12) for the exact error.');
     return;
   }
   const reader = new FileReader();
@@ -476,36 +504,30 @@ function handleUpload(event) {
     try {
       parseWorkbookAndRender(new Uint8Array(e.target.result), file.name);
     } catch (err) {
-      const status = document.getElementById('upload-status');
-      status.style.display = 'block';
-      status.style.color = '#b91c1c';
-      status.textContent = 'Could not read file — check it has semester, kwh, students, sheets, cost_rm columns.';
+      setStatus('error', 'Could not read that file — check it has semester, kwh, students, sheets, cost_rm columns, and that "Semester Data" is the first sheet tab. (' + err.message + ')');
     }
+  };
+  reader.onerror = function() {
+    setStatus('error', 'Browser could not read the file from disk. Try re-selecting it.');
   };
   reader.readAsArrayBuffer(file);
 }
 
 async function loadFromUrl() {
   const url = document.getElementById('url-input').value.trim();
-  const status = document.getElementById('upload-status');
   if (!url) return;
   if (typeof XLSX === 'undefined') {
-    status.style.display = 'block';
-    status.style.color = '#b91c1c';
-    status.textContent = 'CSV library could not load — check your internet connection and try again.';
+    setStatus('error', 'The spreadsheet library (SheetJS) failed to load from the CDN — check your internet connection or try a different network/browser.');
     return;
   }
-  status.style.display = 'block';
-  status.style.color = 'var(--color-pewter)';
-  status.textContent = 'Fetching…';
+  setStatus('loading', 'Fetching…');
   try {
     const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
     parseWorkbookAndRender(new Uint8Array(buf), 'linked sheet');
   } catch (err) {
-    status.style.color = '#b91c1c';
-    status.textContent = 'Could not load that link — likely blocked for cross-origin access. Try a "publish to web" CSV link, or use the file upload instead. (' + err.message + ')';
+    setStatus('error', 'Could not load that link — likely blocked for cross-origin access. Try a "publish to web" CSV link, or use the file upload instead. (' + err.message + ')');
   }
 }
 
