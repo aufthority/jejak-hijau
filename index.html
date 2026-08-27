@@ -399,7 +399,7 @@ table.data-table tr:last-child td { border-bottom: none; }
       <div class="metric-card">
         <div class="metric-label">Electricity intensity</div>
         <div class="metric-value" id="m-kwh">—</div>
-        <div class="metric-sub">kWh per student, this period</div>
+        <div class="metric-sub" id="m-kwh-sub">kWh per student, this period</div>
         <div class="metric-badge" id="m-kwh-badge"></div>
       </div>
       <div class="metric-card">
@@ -411,7 +411,7 @@ table.data-table tr:last-child td { border-bottom: none; }
       <div class="metric-card">
         <div class="metric-label">Paper intensity</div>
         <div class="metric-value" id="m-paper">—</div>
-        <div class="metric-sub">sheets per student, this period</div>
+        <div class="metric-sub" id="m-paper-sub">sheets per student, this period</div>
         <div class="metric-badge" id="m-paper-badge"></div>
       </div>
       <div class="metric-card">
@@ -473,7 +473,7 @@ table.data-table tr:last-child td { border-bottom: none; }
     <hr class="modal-divider">
     <p class="modal-note"><strong>Trend chart —</strong> each point is one reporting period. No comparable KPJU trend line exists in any Group report today. Footprint markers trace KPJU's own trail, not benchmarked against Group figures, which don't exist at this granularity.</p>
     <p class="modal-note"><strong>Target tracker —</strong> self-set per-period reduction targets, the exact qualitative/target-setting layer KPJ Group's own 2025 score flagged as lagging.</p>
-    <p class="modal-note" style="margin-bottom:0"><strong>Progress tab —</strong> once the reduction strategy launches, ongoing actuals are tracked against the goal set for each future period. Periods with no actual yet show as a pending marker on the goal line; hover any point for that period's notes.</p>
+    <p class="modal-note" style="margin-bottom:0"><strong>Progress tab —</strong> once the reduction strategy launches, ongoing actuals are tracked against the goal set for each future period. Switching to this tab also updates the metric cards, the status banner, and the file-loaded timestamp above to reflect the latest <em>reported</em> progress period, rather than the historical baseline — the two datasets are tracked and displayed independently. Periods with no actual yet show as a pending marker on the goal line; hover any point for that period's notes.</p>
   </div>
 </div>
 
@@ -564,7 +564,7 @@ table.data-table tr:last-child td { border-bottom: none; }
     <p class="modal-note" style="margin-top:-4px">One row per reporting period covering your 2-year monitoring window. Set <code>goal_kwh</code> / <code>goal_sheets</code> for every period up front; leave <code>actual_kwh</code> / <code>actual_sheets</code> blank for periods that haven't happened yet, and fill them in as each period reports. Re-upload the same file any time to refresh — nothing is stored between visits.</p>
     <div class="upload-zone" onclick="document.getElementById('file-input-progress').click()">
       <div class="upload-title">Click to upload CSV / XLSX</div>
-      <p>Columns expected: period, goal_kwh, goal_sheets, actual_kwh, actual_sheets, notes</p>
+      <p>Columns expected: period, goal_kwh, goal_sheets, actual_kwh, actual_sheets, notes — plus optional actual_cost_rm if you want the cost card to update too</p>
     </div>
     <input type="file" id="file-input-progress" accept=".csv,.xlsx" onchange="handleUploadProgress(event)">
 
@@ -648,11 +648,35 @@ function setBadge(elId, actual, target, unit, decimals) {
   }
 }
 
-function renderMetrics() {
+// Same as setBadge, but compares against a period's own reduction-strategy goal
+// (from the Progress upload) rather than the flat baseline target — worded
+// "goal" throughout so the two concepts never look interchangeable.
+function setBadgeGoal(elId, actual, goal, unit, decimals) {
+  const fmt = decimals === 2 ? fmt2 : fmt1;
+  const el = document.getElementById(elId);
+  const diff = pctOver(actual, goal);
+  if (diff > 0.5) {
+    el.className = 'metric-badge over';
+    el.textContent = `▲ ${fmt1(diff)}% over goal (${fmt(goal)} ${unit})`;
+  } else if (diff < -0.5) {
+    el.className = 'metric-badge under';
+    el.textContent = `▼ ${fmt1(Math.abs(diff))}% under goal (${fmt(goal)} ${unit}) — good`;
+  } else {
+    el.className = 'metric-badge neutral';
+    el.textContent = `● On goal (${fmt(goal)} ${unit})`;
+  }
+}
+
+function renderBaselineMetrics() {
   const latest = semesterData[semesterData.length - 1];
   const prev = semesterData.length > 1 ? semesterData[semesterData.length - 2] : null;
   const co2PerStudent = (latest.kwh / 1000) * GRID_EMISSION_FACTOR; // kWh -> MWh -> tCO2e
   const co2Target = (targets[0].target / 1000) * GRID_EMISSION_FACTOR; // implied from kWh target
+
+  document.getElementById('m-kwh-sub').textContent = 'kWh per student, this period';
+  document.getElementById('m-paper-sub').textContent = 'sheets per student, this period';
+  document.getElementById('m-co2-sub').textContent = 'tCO₂e per student · location-based';
+  document.getElementById('m-cost-sub').textContent = 'RM per student, this period';
 
   document.getElementById('m-kwh').textContent = fmt1(latest.kwh) + ' kWh';
   document.getElementById('m-co2').textContent = fmt2(co2PerStudent) + ' t';
@@ -675,6 +699,157 @@ function renderMetrics() {
   }
 
   renderInsight(latest, prev, co2PerStudent, co2Target);
+}
+
+function clearMetricCards(subMessage) {
+  ['m-kwh', 'm-co2', 'm-paper', 'm-cost'].forEach(id => { document.getElementById(id).textContent = '—'; });
+  ['m-kwh-badge', 'm-co2-badge', 'm-paper-badge', 'm-cost-badge'].forEach(id => {
+    const el = document.getElementById(id);
+    el.className = 'metric-badge neutral';
+    el.textContent = '';
+  });
+  if (subMessage) {
+    document.getElementById('m-kwh-sub').textContent = subMessage;
+    document.getElementById('m-paper-sub').textContent = subMessage;
+    document.getElementById('m-co2-sub').textContent = subMessage;
+    document.getElementById('m-cost-sub').textContent = subMessage;
+  }
+}
+
+function renderProgressMetrics() {
+  const reported = progressData.filter(d => d.actualKwh != null || d.actualSheets != null);
+  if (!reported.length) {
+    clearMetricCards('No progress reported yet');
+    document.getElementById('insight-banner').style.display = 'none';
+    return;
+  }
+  const latest = reported[reported.length - 1];
+  const idx = progressData.indexOf(latest);
+  const prev = idx > 0 ? progressData[idx - 1] : null;
+  const prevReported = (prev && (prev.actualKwh != null || prev.actualSheets != null)) ? prev : null;
+
+  document.getElementById('m-kwh-sub').textContent = `kWh per student, latest reported (${latest.period})`;
+  document.getElementById('m-paper-sub').textContent = `sheets per student, latest reported (${latest.period})`;
+  document.getElementById('m-co2-sub').textContent = 'tCO₂e per student · location-based';
+  document.getElementById('m-cost-sub').textContent = latest.actualCost != null
+    ? `RM per student, latest reported (${latest.period})`
+    : 'Not tracked in progress data';
+
+  // Electricity
+  if (latest.actualKwh != null) {
+    document.getElementById('m-kwh').textContent = fmt1(latest.actualKwh) + ' kWh';
+    if (latest.goalKwh != null) setBadgeGoal('m-kwh-badge', latest.actualKwh, latest.goalKwh, 'kWh');
+    else { document.getElementById('m-kwh-badge').className = 'metric-badge neutral'; document.getElementById('m-kwh-badge').textContent = 'No goal set for this period'; }
+  } else {
+    document.getElementById('m-kwh').textContent = '—';
+    document.getElementById('m-kwh-badge').className = 'metric-badge neutral';
+    document.getElementById('m-kwh-badge').textContent = '';
+  }
+
+  // Scope 2 (derived from actual kWh)
+  let co2PerStudent = null, co2Goal = null;
+  if (latest.actualKwh != null) {
+    co2PerStudent = (latest.actualKwh / 1000) * GRID_EMISSION_FACTOR;
+    document.getElementById('m-co2').textContent = fmt2(co2PerStudent) + ' t';
+    if (latest.goalKwh != null) {
+      co2Goal = (latest.goalKwh / 1000) * GRID_EMISSION_FACTOR;
+      setBadgeGoal('m-co2-badge', co2PerStudent, co2Goal, 't', 2);
+    } else {
+      document.getElementById('m-co2-badge').className = 'metric-badge neutral';
+      document.getElementById('m-co2-badge').textContent = 'No goal set for this period';
+    }
+  } else {
+    document.getElementById('m-co2').textContent = '—';
+    document.getElementById('m-co2-badge').className = 'metric-badge neutral';
+    document.getElementById('m-co2-badge').textContent = '';
+  }
+
+  // Paper
+  if (latest.actualSheets != null) {
+    document.getElementById('m-paper').textContent = fmt1(latest.actualSheets) + ' sheets';
+    if (latest.goalSheets != null) setBadgeGoal('m-paper-badge', latest.actualSheets, latest.goalSheets, 'sheets');
+    else { document.getElementById('m-paper-badge').className = 'metric-badge neutral'; document.getElementById('m-paper-badge').textContent = 'No goal set for this period'; }
+  } else {
+    document.getElementById('m-paper').textContent = '—';
+    document.getElementById('m-paper-badge').className = 'metric-badge neutral';
+    document.getElementById('m-paper-badge').textContent = '';
+  }
+
+  // Cost (optional column — vs previous reported period, same pattern as baseline)
+  const costBadge = document.getElementById('m-cost-badge');
+  if (latest.actualCost != null) {
+    document.getElementById('m-cost').textContent = 'RM ' + fmt1(latest.actualCost);
+    if (prevReported && prevReported.actualCost != null) {
+      const costChange = ((latest.actualCost - prevReported.actualCost) / prevReported.actualCost) * 100;
+      costBadge.className = 'metric-badge ' + (costChange > 0.5 ? 'over' : costChange < -0.5 ? 'under' : 'neutral');
+      costBadge.textContent = (costChange > 0.5 ? '▲ ' : costChange < -0.5 ? '▼ ' : '● ') + fmt1(Math.abs(costChange)) + '% vs last reported period';
+    } else {
+      costBadge.className = 'metric-badge neutral';
+      costBadge.textContent = 'No prior reported period to compare';
+    }
+  } else {
+    document.getElementById('m-cost').textContent = '—';
+    costBadge.className = 'metric-badge neutral';
+    costBadge.textContent = 'Add actual_cost_rm to track this';
+  }
+
+  renderProgressInsight(latest, prevReported, co2PerStudent, co2Goal);
+}
+
+function renderProgressInsight(latest, prev, co2PerStudent, co2Goal) {
+  const banner = document.getElementById('insight-banner');
+  const parts = [];
+  let hasComparison = false;
+
+  if (latest.actualKwh != null && latest.goalKwh != null) {
+    hasComparison = true;
+    const kwhDiff = pctOver(latest.actualKwh, latest.goalKwh);
+    parts.push(kwhDiff > 0.5
+      ? `electricity is running <strong>${fmt1(kwhDiff)}% above goal</strong>`
+      : `electricity is at or under goal`);
+  }
+  if (latest.actualSheets != null && latest.goalSheets != null) {
+    hasComparison = true;
+    const paperDiff = pctOver(latest.actualSheets, latest.goalSheets);
+    parts.push(paperDiff > 0.5
+      ? `paper use is <strong>${fmt1(paperDiff)}% above goal</strong>`
+      : `paper use is at or under goal`);
+  }
+
+  if (!hasComparison) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  let trendNote = '';
+  if (prev) {
+    const bits = [];
+    if (latest.actualKwh != null && prev.actualKwh != null) {
+      const d = ((latest.actualKwh - prev.actualKwh) / prev.actualKwh) * 100;
+      bits.push(`electricity is <strong>${d > 0.5 ? 'rising' : d < -0.5 ? 'falling' : 'flat'}</strong>`);
+    }
+    if (latest.actualSheets != null && prev.actualSheets != null) {
+      const d = ((latest.actualSheets - prev.actualSheets) / prev.actualSheets) * 100;
+      bits.push(`paper use is <strong>${d > 0.5 ? 'rising' : d < -0.5 ? 'falling' : 'flat'}</strong>`);
+    }
+    if (bits.length) trendNote = ` Compared with the last reported period, ${bits.join(' and ')}.`;
+  }
+
+  const anyOverGoal = (latest.actualKwh != null && latest.goalKwh != null && pctOver(latest.actualKwh, latest.goalKwh) > 0.5)
+    || (latest.actualSheets != null && latest.goalSheets != null && pctOver(latest.actualSheets, latest.goalSheets) > 0.5);
+
+  if (!anyOverGoal) {
+    banner.style.background = '#f0fdf4';
+    banner.style.borderColor = 'rgba(0,153,89,0.3)';
+    banner.style.color = '#14532d';
+    banner.innerHTML = `<span class="icon">✅</span><strong>Tracking on goal (${latest.period})</strong> — ${parts.join(' and ')}.${trendNote}`;
+  } else {
+    banner.style.background = '#fffbeb';
+    banner.style.borderColor = '#fde68a';
+    banner.style.color = '#78350f';
+    banner.innerHTML = `<span class="icon">⚠️</span><strong>Behind goal (${latest.period})</strong> — ${parts.join(' and ')}.${trendNote} These compare against this period's own goal from the progress data — not the flat baseline target.`;
+  }
+  banner.style.display = 'block';
 }
 
 function renderInsight(latest, prev, co2PerStudent, co2Target) {
@@ -847,6 +1022,13 @@ function switchChartTab(tab) {
   }
   renderActiveChart();
   renderActiveTargets();
+  renderActiveMetrics();
+  renderActiveTimestamp();
+}
+
+function renderActiveMetrics() {
+  if (activeChartTab === 'baseline') renderBaselineMetrics();
+  else renderProgressMetrics();
 }
 
 function renderActiveChart() {
@@ -1078,9 +1260,10 @@ function renderAll() {
   emptyState.style.display = 'none';
   content.style.display = 'flex';
 
-  renderMetrics();
+  renderActiveMetrics();
   renderActiveChart();
   renderActiveTargets();
+  renderActiveTimestamp();
   renderCohortTable();
 }
 
@@ -1093,21 +1276,28 @@ function setStatus(kind, message) {
   else console.log('[Jejak Hijau KPJU]', message);
 }
 
-function renderTimestamp(wbModifiedDate) {
-  const el = document.getElementById('data-timestamp');
-  const loadedAt = new Date();
-  const loadedStr = loadedAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+// Each dataset (baseline, progress) tracks its own file's timestamp, since they're
+// uploaded independently and may be refreshed at different times.
+let baselineTimestamp = null;  // { modifiedDate, loadedAt } | null
+let progressTimestamp = null;
 
+function renderActiveTimestamp() {
+  const el = document.getElementById('data-timestamp');
+  const state = activeChartTab === 'baseline' ? baselineTimestamp : progressTimestamp;
+  if (!state) { el.style.display = 'none'; return; }
+
+  const loadedStr = state.loadedAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
   let modifiedStr = 'unknown (file has no readable modified-date metadata)';
   let isStale = false;
-  if (wbModifiedDate instanceof Date && !isNaN(wbModifiedDate)) {
-    modifiedStr = wbModifiedDate.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-    const ageDays = (loadedAt - wbModifiedDate) / (1000 * 60 * 60 * 24);
+  if (state.modifiedDate instanceof Date && !isNaN(state.modifiedDate)) {
+    modifiedStr = state.modifiedDate.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    const ageDays = (state.loadedAt - state.modifiedDate) / (1000 * 60 * 60 * 24);
     isStale = ageDays > 120; // roughly one reporting period — flag as possibly outdated
   }
 
+  const fileLabel = activeChartTab === 'baseline' ? 'Baseline file' : 'Progress file';
   el.className = 'data-timestamp' + (isStale ? ' stale' : '');
-  el.innerHTML = `📅 <strong>File last modified:</strong> ${modifiedStr} <span class="sep">·</span> <strong>Loaded into this dashboard:</strong> ${loadedStr}` +
+  el.innerHTML = `📅 <strong>${fileLabel} last modified:</strong> ${modifiedStr} <span class="sep">·</span> <strong>Loaded into this dashboard:</strong> ${loadedStr}` +
     (isStale ? ' <span class="sep">·</span> <strong>⚠ This file may be out of date</strong> — check with the data owner before using it for decisions.' : '');
   el.style.display = 'flex';
 }
@@ -1128,9 +1318,9 @@ function parseWorkbookAndRender(arrayBufferOrData, sourceLabel) {
     .filter(r => r.students > 0); // drops stray note/blank rows that have no real headcount
   if (!cleaned.length) throw new Error('No valid data rows found (each row needs a students count > 0)');
   semesterData = cleaned;
-  renderAll();
   const modifiedDate = wb.Props && wb.Props.ModifiedDate ? wb.Props.ModifiedDate : null;
-  renderTimestamp(modifiedDate);
+  baselineTimestamp = { modifiedDate, loadedAt: new Date() };
+  renderAll();
   setStatus('success', `Loaded ${rows.length} row(s) from ${sourceLabel} — dashboard updated.`);
   closeModal('modal-upload');
 }
@@ -1197,12 +1387,15 @@ function parseProgressWorkbookAndRender(arrayBufferOrData, sourceLabel) {
       goalSheets: numOrNull(pick(r, ['goal_sheets', 'Goal_Sheets', 'GoalSheets'])),
       actualKwh: numOrNull(pick(r, ['actual_kwh', 'Actual_kWh', 'actual_kWh', 'ActualKwh'])),
       actualSheets: numOrNull(pick(r, ['actual_sheets', 'Actual_Sheets', 'ActualSheets'])),
+      actualCost: numOrNull(pick(r, ['actual_cost_rm', 'Actual_Cost_RM', 'actual_cost', 'ActualCostRm'])),
       notes: pick(r, ['notes', 'Notes']) || '',
     }))
     // drops stray note/blank rows — a real row needs a period label and at least one goal value
     .filter(r => r.period !== '—' && (r.goalKwh != null || r.goalSheets != null));
   if (!cleaned.length) throw new Error('No valid rows found (each row needs a period label and at least one goal_kwh/goal_sheets value)');
   progressData = cleaned;
+  const modifiedDate = wb.Props && wb.Props.ModifiedDate ? wb.Props.ModifiedDate : null;
+  progressTimestamp = { modifiedDate, loadedAt: new Date() };
 
   if (semesterData.length) {
     switchChartTab('progress');
