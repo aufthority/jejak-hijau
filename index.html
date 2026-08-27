@@ -145,6 +145,30 @@ main { max-width: 1100px; margin: 0 auto; padding: 32px 40px; }
 .metric-value { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--color-rich-black); line-height: 1.1; }
 .metric-sub { font-size: 11px; color: var(--color-pewter); margin-top: 6px; }
 .metric-sub.good { color: var(--color-grain-green); font-weight: 500; }
+.metric-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--radius-tag);
+  margin-top: 8px;
+}
+.metric-badge.over { background: #fef2f2; color: #b91c1c; }
+.metric-badge.under { background: rgba(0,153,89,0.1); color: var(--color-grain-green); }
+.metric-badge.neutral { background: var(--color-cloud-gray); color: var(--color-muted-stone); }
+.insight-banner {
+  background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-card);
+  padding: 14px 18px; margin-bottom: 20px; font-size: 13px; color: #78350f; line-height: 1.6;
+}
+.insight-banner strong { font-weight: 700; }
+.insight-banner .icon { margin-right: 6px; }
+.data-timestamp {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  font-size: 11px; color: var(--color-muted-stone);
+  background: var(--color-cloud-gray); border-radius: var(--radius-btn);
+  padding: 8px 12px; margin-bottom: 16px;
+}
+.data-timestamp strong { color: var(--color-deep-graphite); font-weight: 600; }
+.data-timestamp .sep { color: var(--color-pewter); }
+.data-timestamp.stale { background: #fef2f2; color: #b91c1c; }
+.data-timestamp.stale strong { color: #b91c1c; }
 
 /* SECTION CARD */
 .section-card {
@@ -245,8 +269,9 @@ footer {
 
 <div class="hero">
   <div class="hero-eyebrow">KPJ Healthcare University · Green Healthcare Sustainability Framework</div>
-  <h1>Tracking KPJU's <em>footprint</em>,<br>one semester at a time.</h1>
+  <h1>Tracking KPJU's <em>footprint</em>,<br>one reporting period at a time.</h1>
   <p>Unit-level intensity data — energy and paper use per student — that doesn't currently exist anywhere in KPJ Group's sustainability reporting. Built on the GHG Protocol Corporate Standard, the same accounting foundation universities and companies worldwide use for emissions disclosure.</p>
+  <p style="font-size:12px;color:var(--color-pewter);margin-top:8px">Reporting period shown here is a semester, KPJU's own academic cycle. The same method applies to any reporting cadence — a hospital site could run this monthly or quarterly against its own billing cycle without changing the underlying calculation.</p>
 </div>
 
 <main>
@@ -258,39 +283,47 @@ footer {
   </div>
 
   <div id="dashboard-content" style="display:none">
+  <div id="insight-banner" class="insight-banner" style="display:none"></div>
+
+  <div id="data-timestamp" class="data-timestamp" style="display:none"></div>
+
   <div class="metric-grid">
     <div class="metric-card">
       <div class="metric-label">Electricity intensity</div>
       <div class="metric-value" id="m-kwh">—</div>
-      <div class="metric-sub">kWh per student, this semester</div>
+      <div class="metric-sub">kWh per student, this period</div>
+      <div class="metric-badge" id="m-kwh-badge"></div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Scope 2 emissions</div>
       <div class="metric-value" id="m-co2">—</div>
       <div class="metric-sub" id="m-co2-sub">tCO₂e per student · location-based</div>
+      <div class="metric-badge" id="m-co2-badge"></div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Paper intensity</div>
       <div class="metric-value" id="m-paper">—</div>
-      <div class="metric-sub">sheets per student, this semester</div>
+      <div class="metric-sub">sheets per student, this period</div>
+      <div class="metric-badge" id="m-paper-badge"></div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Electricity cost</div>
       <div class="metric-value" id="m-cost">—</div>
-      <div class="metric-sub" id="m-cost-sub">RM per student, this semester</div>
+      <div class="metric-sub" id="m-cost-sub">RM per student, this period</div>
+      <div class="metric-badge" id="m-cost-badge"></div>
     </div>
   </div>
 
   <div class="section-card">
-    <div class="section-title">Semester trend — energy &amp; paper intensity</div>
-    <div class="section-subtitle">Each point is one semester. No comparable KPJU trend line exists in any Group report today.</div>
+    <div class="section-title">Reporting-period trend — energy &amp; paper intensity</div>
+    <div class="section-subtitle">Each point is one reporting period — a semester at KPJU, but the same method works for any cadence. No comparable KPJU trend line exists in any Group report today.</div>
     <div class="chart-wrap"><canvas id="trend-chart"></canvas></div>
     <div class="footprint-note">🐾 Footprint markers trace KPJU's own trail — not benchmarked against Group figures, which don't exist at this granularity.</div>
   </div>
 
   <div class="section-card">
-    <div class="section-title">Target vs. actual — this semester</div>
-    <div class="section-subtitle">Self-set semester reduction targets, the exact qualitative/target-setting layer KPJ Group's own 2025 score flagged as lagging.</div>
+    <div class="section-title">Target vs. actual — this period</div>
+    <div class="section-subtitle">Self-set per-period reduction targets, the exact qualitative/target-setting layer KPJ Group's own 2025 score flagged as lagging.</div>
     <div id="target-tracker"></div>
   </div>
 
@@ -336,7 +369,7 @@ footer {
     <div class="section-subtitle">Upload a CSV/XLSX or paste a link once Finance, the Exam Unit, and the Registrar have supplied figures — the dashboard above populates from this.</div>
     <div class="upload-zone" onclick="document.getElementById('file-input').click()">
       <div class="upload-title">Click to upload CSV / XLSX</div>
-      <p>Columns expected: semester, kwh, students, sheets, cost_rm</p>
+      <p>Columns expected: semester (or any period label), kwh, students, sheets, cost_rm</p>
     </div>
     <input type="file" id="file-input" accept=".csv,.xlsx" onchange="handleUpload(event)">
 
@@ -375,21 +408,95 @@ let chart;
 function fmt1(n) { return Number(n).toLocaleString(undefined, { maximumFractionDigits: 1 }); }
 function fmt2(n) { return Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 }); }
 
+function pctOver(actual, target) { return ((actual - target) / target) * 100; }
+
+function setBadge(elId, actual, target, unit, decimals) {
+  const fmt = decimals === 2 ? fmt2 : fmt1;
+  const el = document.getElementById(elId);
+  const diff = pctOver(actual, target);
+  if (diff > 0.5) {
+    el.className = 'metric-badge over';
+    el.textContent = `▲ ${fmt1(diff)}% over target (${fmt(target)} ${unit})`;
+  } else if (diff < -0.5) {
+    el.className = 'metric-badge under';
+    el.textContent = `▼ ${fmt1(Math.abs(diff))}% under target (${fmt(target)} ${unit}) — good`;
+  } else {
+    el.className = 'metric-badge neutral';
+    el.textContent = `● On target (${fmt(target)} ${unit})`;
+  }
+}
+
 function renderMetrics() {
   const latest = semesterData[semesterData.length - 1];
+  const prev = semesterData.length > 1 ? semesterData[semesterData.length - 2] : null;
   const co2PerStudent = (latest.kwh / 1000) * GRID_EMISSION_FACTOR; // kWh -> MWh -> tCO2e
+  const co2Target = (targets[0].target / 1000) * GRID_EMISSION_FACTOR; // implied from kWh target
+
   document.getElementById('m-kwh').textContent = fmt1(latest.kwh) + ' kWh';
   document.getElementById('m-co2').textContent = fmt2(co2PerStudent) + ' t';
   document.getElementById('m-paper').textContent = fmt1(latest.sheets) + ' sheets';
   document.getElementById('m-cost').textContent = 'RM ' + fmt1(latest.cost_rm);
+
+  setBadge('m-kwh-badge', latest.kwh, targets[0].target, 'kWh');
+  setBadge('m-co2-badge', co2PerStudent, co2Target, 't', 2);
+  setBadge('m-paper-badge', latest.sheets, targets[1].target, 'sheets');
+
+  // Cost has no fixed target — show change vs previous semester instead
+  const costBadge = document.getElementById('m-cost-badge');
+  if (prev) {
+    const costChange = ((latest.cost_rm - prev.cost_rm) / prev.cost_rm) * 100;
+    costBadge.className = 'metric-badge ' + (costChange > 0.5 ? 'over' : costChange < -0.5 ? 'under' : 'neutral');
+    costBadge.textContent = (costChange > 0.5 ? '▲ ' : costChange < -0.5 ? '▼ ' : '● ') + fmt1(Math.abs(costChange)) + '% vs last period';
+  } else {
+    costBadge.className = 'metric-badge neutral';
+    costBadge.textContent = 'No prior period to compare';
+  }
+
+  renderInsight(latest, prev, co2PerStudent, co2Target);
+}
+
+function renderInsight(latest, prev, co2PerStudent, co2Target) {
+  const banner = document.getElementById('insight-banner');
+  const kwhDiff = pctOver(latest.kwh, targets[0].target);
+  const paperDiff = pctOver(latest.sheets, targets[1].target);
+  const parts = [];
+
+  if (kwhDiff > 0.5) {
+    parts.push(`electricity is running <strong>${fmt1(kwhDiff)}% above target</strong>`);
+  } else {
+    parts.push(`electricity is at or under target`);
+  }
+  if (paperDiff > 0.5) {
+    parts.push(`paper use is <strong>${fmt1(paperDiff)}% above target</strong>`);
+  } else {
+    parts.push(`paper use is at or under target`);
+  }
+
+  let trendNote = '';
+  if (prev) {
+    const kwhChange = ((latest.kwh - prev.kwh) / prev.kwh) * 100;
+    const sheetsChange = ((latest.sheets - prev.sheets) / prev.sheets) * 100;
+    const direction = kwhChange > 0.5 ? 'rising' : kwhChange < -0.5 ? 'falling' : 'flat';
+    const pdirection = sheetsChange > 0.5 ? 'rising' : sheetsChange < -0.5 ? 'falling' : 'flat';
+    trendNote = ` Compared with the last period, electricity is <strong>${direction}</strong> and paper use is <strong>${pdirection}</strong>.`;
+  }
+
+  if (kwhDiff <= 0.5 && paperDiff <= 0.5) {
+    banner.style.background = '#f0fdf4';
+    banner.style.borderColor = 'rgba(0,153,89,0.3)';
+    banner.style.color = '#14532d';
+    banner.innerHTML = `<span class="icon">✅</span><strong>This period is on track</strong> — ${parts.join(' and ')}.${trendNote}`;
+  } else {
+    banner.style.background = '#fffbeb';
+    banner.style.borderColor = '#fde68a';
+    banner.style.color = '#78350f';
+    banner.innerHTML = `<span class="icon">⚠️</span><strong>This period needs attention</strong> — ${parts.join(' and ')}.${trendNote} Lower is better for both metrics — the red "over target" badges above show exactly where the gap is.`;
+  }
+  banner.style.display = 'block';
 }
 
 function renderChart() {
   const ctx = document.getElementById('trend-chart').getContext('2d');
-  const footprintImg = new Image();
-  // simple inline SVG footprint as point style via emoji fallback isn't supported by Chart.js point styles directly,
-  // so we use a custom circle with a footprint-emoji datalabel plugin-free approach: draw emoji via pointStyle 'circle'
-  // and annotate with a footprint emoji above each point using afterDatasetsDraw.
   if (chart) chart.destroy();
   chart = new Chart(ctx, {
     type: 'line',
@@ -418,6 +525,26 @@ function renderChart() {
           fill: true,
           yAxisID: 'y1',
         },
+        {
+          label: 'Electricity target (42 kWh)',
+          data: semesterData.map(() => targets[0].target),
+          borderColor: '#009959',
+          borderDash: [6, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Paper target (30 sheets)',
+          data: semesterData.map(() => targets[1].target),
+          borderColor: '#949494',
+          borderDash: [6, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false,
+          yAxisID: 'y1',
+        },
       ],
     },
     options: {
@@ -426,7 +553,19 @@ function renderChart() {
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { position: 'bottom', labels: { font: { family: 'Inter', size: 11 }, boxWidth: 10 } },
-        tooltip: { callbacks: { afterLabel: () => '🐾' } },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const label = ctx.dataset.label;
+              const val = ctx.parsed.y;
+              if (label.includes('target')) return label + ': ' + fmt1(val);
+              const targetVal = label.includes('kWh') ? targets[0].target : targets[1].target;
+              const diff = pctOver(val, targetVal);
+              const flag = diff > 0.5 ? ` (${fmt1(diff)}% over target)` : ' (at/under target)';
+              return `${label}: ${fmt1(val)}${flag}`;
+            },
+          },
+        },
       },
       scales: {
         y: { position: 'left', title: { display: true, text: 'kWh/student', font: { size: 10 } }, grid: { color: '#f0f0f0' } },
@@ -489,6 +628,7 @@ function renderAll() {
   if (!semesterData.length) {
     emptyState.style.display = 'block';
     content.style.display = 'none';
+    document.getElementById('data-timestamp').style.display = 'none';
     return;
   }
 
@@ -516,6 +656,25 @@ function setStatus(kind, message) {
   else console.log('[Jejak Hijau KPJU]', message);
 }
 
+function renderTimestamp(wbModifiedDate) {
+  const el = document.getElementById('data-timestamp');
+  const loadedAt = new Date();
+  const loadedStr = loadedAt.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+
+  let modifiedStr = 'unknown (file has no readable modified-date metadata)';
+  let isStale = false;
+  if (wbModifiedDate instanceof Date && !isNaN(wbModifiedDate)) {
+    modifiedStr = wbModifiedDate.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    const ageDays = (loadedAt - wbModifiedDate) / (1000 * 60 * 60 * 24);
+    isStale = ageDays > 120; // roughly one reporting period — flag as possibly outdated
+  }
+
+  el.className = 'data-timestamp' + (isStale ? ' stale' : '');
+  el.innerHTML = `📅 <strong>File last modified:</strong> ${modifiedStr} <span class="sep">·</span> <strong>Loaded into this dashboard:</strong> ${loadedStr}` +
+    (isStale ? ' <span class="sep">·</span> <strong>⚠ This file may be out of date</strong> — check with the data owner before using it for decisions.' : '');
+  el.style.display = 'flex';
+}
+
 function parseWorkbookAndRender(arrayBufferOrData, sourceLabel) {
   const wb = XLSX.read(arrayBufferOrData, { type: 'array' });
   const sheet = wb.Sheets[wb.SheetNames[0]];
@@ -533,6 +692,8 @@ function parseWorkbookAndRender(arrayBufferOrData, sourceLabel) {
   if (!cleaned.length) throw new Error('No valid data rows found (each row needs a students count > 0)');
   semesterData = cleaned;
   renderAll();
+  const modifiedDate = wb.Props && wb.Props.ModifiedDate ? wb.Props.ModifiedDate : null;
+  renderTimestamp(modifiedDate);
   setStatus('success', `Loaded ${rows.length} row(s) from ${sourceLabel} — dashboard updated.`);
 }
 
