@@ -569,7 +569,7 @@ table.data-table tr:last-child td { border-bottom: none; }
       <div class="tier-box">
         <div class="tier-label">Tier 2 — KPJU bottom-up data</div>
         <span class="scope-badge">Scope 2 · dual method</span>
-        <p>kWh/student from Finance billing, converted to tCO₂e using Malaysia's grid emission factor. Reported both location-based (grid average) and market-based (accounting for GET, if applicable), per GHG Protocol Scope 2 Guidance.</p>
+        <p>kWh/student from Finance billing, converted to tCO₂e using Peninsular Malaysia's official Grid Emission Factor — Suruhanjaya Tenaga (Energy Commission), 2024 (provisional): 0.740 tCO₂e/MWh. Reported both location-based (grid average) and market-based (accounting for GET, if applicable), per GHG Protocol Scope 2 Guidance. ST labels this factor provisional pending final government endorsement — worth re-checking against ST's published GEF annually.</p>
       </div>
       <div class="tier-box future">
         <div class="tier-label">Scope 1 — direct emissions</div>
@@ -684,7 +684,7 @@ document.querySelectorAll('.metric-card').forEach(function(el) {
 });
 
 // ---- Demo dataset (clearly placeholder — swapped by CSV upload) ----
-const GRID_EMISSION_FACTOR = 0.585; // tCO2e per MWh, Malaysia peninsular grid (indicative, verify against latest published factor)
+const GRID_EMISSION_FACTOR = 0.740; // tCO2e per MWh, Peninsular Malaysia — Suruhanjaya Tenaga (Energy Commission) official Grid Emission Factor, 2024 (provisional; published 23 Feb 2026). Update when ST publishes a newer year.
 
 let semesterData = [];
 
@@ -1147,8 +1147,8 @@ const METRIC_INFO = {
   co2: {
     icon: METRIC_ICON_GLOBE,
     title: 'Scope 2 Emissions',
-    what: 'The indirect greenhouse-gas emissions caused by the electricity KPJU purchases from the grid, under the GHG Protocol Scope 2 category. This is a location-based figure — it uses Malaysia’s national grid emission factor rather than a supplier-specific (market-based) one, since KPJU has not purchased Renewable Energy Certificates or a green electricity tariff (GET) for this period. If a GET is purchased in future, a market-based figure should be reported alongside this one, as the GHG Protocol requires dual reporting.',
-    how: 'Electricity intensity (kWh/student) is converted to tonnes of CO₂-equivalent per student using Malaysia’s peninsular grid emission factor of 0.585 tCO₂e per MWh: (kWh ÷ 1000) × 0.585.'
+    what: 'The indirect greenhouse-gas emissions caused by the electricity KPJU purchases from the grid, under the GHG Protocol Scope 2 category. This is a location-based figure — it uses Malaysia’s national grid emission factor rather than a supplier-specific (market-based) one, since KPJU has not purchased Renewable Energy Certificates or a green electricity tariff (GET) for this period. If a GET is purchased in future, a market-based figure should be reported alongside this one, as the GHG Protocol requires dual reporting. The factor itself is provisional (see How it\u2019s calculated) and will be updated as Suruhanjaya Tenaga confirms or revises it.',
+    how: 'Electricity intensity (kWh/student) is converted to tonnes of CO₂-equivalent per student using Peninsular Malaysia’s official Grid Emission Factor of 0.740 tCO₂e per MWh — Suruhanjaya Tenaga (Energy Commission), 2024 figure, published 23 Feb 2026: (kWh ÷ 1000) × 0.740. ST labels this figure provisional, pending final government endorsement; any revision is expected to be minor.'
   },
   paper: {
     icon: METRIC_ICON_FILE,
